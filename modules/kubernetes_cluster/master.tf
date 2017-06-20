@@ -110,7 +110,7 @@ resource "aws_security_group_rule" "master_elb_to_master" {
   protocol                 = "tcp"
 }
 
-resource "aws_security_group_rule" "internalmaster_elb_to_master" {
+resource "aws_security_group_rule" "internal_master_elb_to_master" {
   type                     = "ingress"
   security_group_id        = "${aws_security_group.master.id}"
   source_security_group_id = "${aws_security_group.master_internal_elb.id}"
