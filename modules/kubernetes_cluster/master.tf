@@ -145,7 +145,7 @@ resource "aws_security_group" "master_internal_elb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags {
-    Name = "${var.cluster_name}_master_interal_elb"
+    Name = "${var.cluster_name}_master_internal_elb"
   }
 }
 
