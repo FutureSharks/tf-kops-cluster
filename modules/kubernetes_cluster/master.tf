@@ -32,17 +32,17 @@ resource "aws_autoscaling_group" "master" {
 }
 
 resource "aws_elb" "master" {
-  name                      = "${var.cluster_name}-master"
-  subnets                   = ["${var.vpc_public_subnet_ids}"]
-  security_groups           = [
+  name            = "${var.cluster_name}-master"
+  subnets         = ["${var.vpc_public_subnet_ids}"]
+  security_groups = [
     "${aws_security_group.master_elb.id}",
     "${var.sg_allow_http_s}"
   ]
   listener {
-    instance_port      = 443
-    instance_protocol  = "tcp"
-    lb_port            = 443
-    lb_protocol        = "tcp"
+    instance_port     = 443
+    instance_protocol = "tcp"
+    lb_port           = 443
+    lb_protocol       = "tcp"
   }
   health_check {
     healthy_threshold   = 2
@@ -107,9 +107,9 @@ resource "aws_security_group" "master" {
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -137,9 +137,9 @@ resource "aws_security_group" "master_elb" {
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master ELB"
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags {
@@ -152,9 +152,9 @@ resource "aws_security_group" "master_internal_elb" {
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master internal ELB"
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags {

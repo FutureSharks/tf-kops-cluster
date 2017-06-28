@@ -1,7 +1,5 @@
 # Full working example with VPC resources
 
-data "aws_availability_zones" "available" {}
-
 variable "availability_zones" {
   type = "map"
   default = {
