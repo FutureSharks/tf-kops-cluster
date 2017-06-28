@@ -1,5 +1,5 @@
 resource "random_id" "s3_suffix" {
-  byte_length = 6
+  byte_length = 3
 }
 
 resource "aws_s3_bucket" "kops" {
