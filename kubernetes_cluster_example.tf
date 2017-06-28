@@ -22,7 +22,6 @@ module "cluster1" {
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster1"
   cluster_fqdn                = "cluster1.${aws_route53_zone.internal_zone.name}"
-  aws_region                  = "eu-west-1"
   route53_zone_id             = "${aws_route53_zone.internal_zone.id}"
   kops_s3_bucket_arn          = "${aws_s3_bucket.kops.arn}"
   kops_s3_bucket_id           = "${aws_s3_bucket.kops.id}"
@@ -30,7 +29,6 @@ module "cluster1" {
   instance_key_name           = "default-key"
   vpc_public_subnet_ids       = ["${aws_subnet.public.*.id}"]
   vpc_private_subnet_ids      = ["${aws_subnet.private.*.id}"]
-  master_availability_zone    = "eu-west-1a"
   node_asg_desired            = 1
   node_asg_min                = 1
   node_asg_max                = 1
@@ -38,6 +36,7 @@ module "cluster1" {
   node_instance_type          = "t2.small"
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
+  dns                         = "private"
 }
 
 resource "aws_vpc" "my_vpc" {

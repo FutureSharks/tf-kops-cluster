@@ -2,8 +2,6 @@
 variable "cluster_name" {}
 # Fully qualified DNS name of cluster
 variable "cluster_fqdn" {}
-# The AWS resgion
-variable "aws_region" {}
 # ID of the VPC
 variable "vpc_id" {}
 # Route53 zone ID
@@ -26,8 +24,6 @@ variable "vpc_public_subnet_ids" {
 variable "vpc_private_subnet_ids" {
   type = "list"
 }
-# AZ for the master
-variable "master_availability_zone" {}
 # IAM instance profile to use for the master
 variable "master_iam_instance_profile" {}
 # AMI ID to use for the master
@@ -67,4 +63,8 @@ variable "kubernetes_version" {
 # Cloudwatch log group log retention in days
 variable "cloudwatch_log_group_retention" {
   default = 30
+}
+# kops DNS setting
+variable "dns" {
+  default = "public"
 }
