@@ -4,4 +4,5 @@
 - Do we need an internal ELB?
 - Does on destroy `kops delete cluster` work?
 - Use ALBs instead of ELBs
-- Support more options for `kops create cluster`, e.g. public topology or multizone master
+- Support more options for `kops create cluster`
+- Support extra user-data

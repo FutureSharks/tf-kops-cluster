@@ -2,7 +2,15 @@
 
 This module allows you to better integrate kops created Kubernetes clusters into existing AWS/Terraform infrastructure.
 
-One of the main problems with the Terraform output from kops is that it is too simplistic and creates many duplicated resources. This can make integrating the Terraform code into an existing and already complex Terraform code base challenging. Especially when you need multiple clusters. This module aims to solve this by using a Terraform module and shared IAM policies to reduce amount of duplicated resources and code.
+One of the main problems with the Terraform output from kops is that it is too simplistic and creates many duplicated resources. This can make integrating the Terraform code into an existing and already complex Terraform code base challenging. Especially when you need multiple clusters.
+
+This module aims to solve this by using a Terraform module and shared resources to reduce duplication. Common resource that already exist in your AWS account can then be used:
+
+  - VPC
+  - IAM policies
+  - Security Groups
+  - kops bucket
+  - Instance profiles
 
 Pull requests welcome.
 

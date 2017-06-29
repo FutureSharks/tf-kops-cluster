@@ -1,16 +1,16 @@
 resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
   count                = "${length(data.aws_availability_zones.available.names)}"
-  name_prefix          = "${var.cluster_name}_master"
-  vpc_zone_identifier  = ["${var.vpc_public_subnet_ids}"]
+  name                 = "${var.cluster_name}_master_${element(split(",", "a,b,c"), count.index)}"
+  vpc_zone_identifier  = ["${element(var.vpc_public_subnet_ids, count.index)}"]
   launch_configuration = "${aws_launch_configuration.master.id}"
   load_balancers       = [
     "${aws_elb.master.name}",
     "${aws_elb.master_internal.name}"
   ]
-  max_size             = 1
-  min_size             = 1
-  desired_capacity     = 1
+  max_size         = 1
+  min_size         = 1
+  desired_capacity = 1
 
   tag = {
     key                 = "KubernetesCluster"
@@ -20,7 +20,7 @@ resource "aws_autoscaling_group" "master" {
 
   tag = {
     key                 = "Name"
-    value               = "${var.cluster_name}_master_${element(data.aws_availability_zones.available.names, count.index)}"
+    value               = "${var.cluster_name}_master_${element(split(",", "a,b,c"), count.index)}"
     propagate_at_launch = true
   }
 
@@ -58,10 +58,10 @@ resource "aws_elb" "master" {
 }
 
 resource "aws_elb" "master_internal" {
-  name               = "${var.cluster_name}-master-internal"
-  subnets            = ["${var.vpc_private_subnet_ids}"]
-  internal           = true
-  idle_timeout       = 300
+  name         = "${var.cluster_name}-master-internal"
+  subnets      = ["${var.vpc_private_subnet_ids}"]
+  internal     = true
+  idle_timeout = 300
   listener = {
     instance_port     = 443
     instance_protocol = "TCP"
@@ -173,17 +173,16 @@ data "template_file" "master_user_data" {
 }
 
 resource "aws_launch_configuration" "master" {
-  name_prefix                 = "${var.cluster_name}-master-"
-  image_id                    = "${var.master_instance_ami_id}"
-  instance_type               = "${var.master_instance_type}"
-  key_name                    = "${var.instance_key_name}"
-  iam_instance_profile        = "${var.master_iam_instance_profile}"
-  security_groups             = [
+  name_prefix          = "${var.cluster_name}-master-"
+  image_id             = "${var.master_instance_ami_id}"
+  instance_type        = "${var.master_instance_type}"
+  key_name             = "${var.instance_key_name}"
+  iam_instance_profile = "${var.master_iam_instance_profile}"
+  security_groups      = [
     "${aws_security_group.master.id}",
     "${var.sg_allow_ssh}"
   ]
 
-  associate_public_ip_address = true
   user_data                   = "${file("${path.module}/data/user_data.sh")}${data.template_file.master_user_data.rendered}"
 
   root_block_device = {
