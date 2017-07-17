@@ -39,6 +39,10 @@ See comments in [modules/kubernetes_cluster/variables.tf](modules/kubernetes_clu
 
 Full example with VPC resources in [kubernetes_cluster_example.tf](kubernetes_cluster_example.tf). `terraform apply` can be run from the root of this repo to build example cluster with shared VPC and IAM resources.
 
+## Notes
+
+If the `cluster_fqdn` is not resolvable from where you run `kubectl` then you get an SSL error. The easiest solution is to use a public domain in Route53.
+
 ## Versions
 
 Currently kops version 1.6.0 is supported. When a new kops version is available and the user data scripts are changed, a tag will be created with this format: `kops_version`-`module_version`
