@@ -26,20 +26,12 @@ variable "vpc_private_subnet_ids" {
 }
 # IAM instance profile to use for the master
 variable "master_iam_instance_profile" {}
-# AMI ID to use for the master
-variable "master_instance_ami_id" {
-  default = "ami-72aaa814"
-}
 # Instance type for the master
 variable "master_instance_type" {
   default = "m3.medium"
 }
 # IAM instance profile to use for the nodes
 variable "node_iam_instance_profile" {}
-# AMI ID to use for the nodes
-variable "node_instance_ami_id" {
-  default = "ami-72aaa814"
-}
 # Instance type for nodes
 variable "node_instance_type" {
   default = "t2.medium"

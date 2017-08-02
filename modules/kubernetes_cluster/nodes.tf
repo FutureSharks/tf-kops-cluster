@@ -7,6 +7,16 @@ resource "aws_autoscaling_group" "node" {
   desired_capacity     = "${var.node_asg_desired}"
   vpc_zone_identifier  = ["${var.vpc_public_subnet_ids}"]
 
+  # Ignore changes to autoscaling group min/max/desired as these attributes are
+  # managed by the Kubernetes cluster autoscaler
+  lifecycle {
+      ignore_changes = [
+        "max_size",
+        "min_size",
+        "desired_capacity"
+      ]
+  }
+
   tag = {
     key                 = "KubernetesCluster"
     value               = "${var.cluster_fqdn}"
@@ -45,7 +55,7 @@ data "template_file" "node_user_data" {
 
 resource "aws_launch_configuration" "node" {
   name_prefix                 = "${var.cluster_name}-node"
-  image_id                    = "${var.node_instance_ami_id}"
+  image_id                    = "${data.aws_ami.k8s_1_6_debian_jessie_ami.id}"
   instance_type               = "${var.node_instance_type}"
   key_name                    = "${var.instance_key_name}"
   iam_instance_profile        = "${var.node_iam_instance_profile}"
