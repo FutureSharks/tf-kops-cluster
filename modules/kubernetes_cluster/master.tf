@@ -1,6 +1,6 @@
 resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
-  count                = "${length(data.aws_availability_zones.available.names)}"
+  count                = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
   name                 = "${var.cluster_name}_master_${element(split(",", "a,b,c"), count.index)}"
   vpc_zone_identifier  = ["${element(var.vpc_public_subnet_ids, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
@@ -163,7 +163,7 @@ resource "aws_security_group" "master_internal_elb" {
 }
 
 data "template_file" "master_user_data" {
-  count    = "${length(data.aws_availability_zones.available.names)}"
+  count    = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
   template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
   vars {
     cluster_fqdn           = "${var.cluster_fqdn}"
@@ -174,7 +174,7 @@ data "template_file" "master_user_data" {
 }
 
 resource "aws_launch_configuration" "master" {
-  count                = "${length(data.aws_availability_zones.available.names)}"
+  count                = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
   name_prefix          = "${var.cluster_name}-master-${element(data.aws_availability_zones.available.names, count.index)}-"
   image_id             = "${data.aws_ami.k8s_1_6_debian_jessie_ami.id}"
   instance_type        = "${var.master_instance_type}"
@@ -204,7 +204,7 @@ resource "aws_launch_configuration" "master" {
 }
 
 resource "aws_ebs_volume" "etcd-events" {
-  count             = "${length(data.aws_availability_zones.available.names)}"
+  count             = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
   availability_zone = "${element(data.aws_availability_zones.available.names, count.index)}"
   size              = 20
   type              = "gp2"
@@ -219,7 +219,7 @@ resource "aws_ebs_volume" "etcd-events" {
 }
 
 resource "aws_ebs_volume" "etcd-main" {
-  count             = "${length(data.aws_availability_zones.available.names)}"
+  count             = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
   availability_zone = "${element(data.aws_availability_zones.available.names, count.index)}"
   size              = 20
   type              = "gp2"
