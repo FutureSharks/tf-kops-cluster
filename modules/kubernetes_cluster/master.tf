@@ -189,7 +189,7 @@ resource "aws_launch_configuration" "master" {
 
   root_block_device = {
     volume_type           = "gp2"
-    volume_size           = 20
+    volume_size           = 64
     delete_on_termination = true
   }
 
