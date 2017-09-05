@@ -14,7 +14,7 @@ resource "aws_autoscaling_group" "master" {
 
   tag = {
     key                 = "KubernetesCluster"
-    value               = "${var.cluster_fqdn}"
+    value               = "${data.template_file.cluster_fqdn.rendered}"
     propagate_at_launch = true
   }
 
@@ -53,7 +53,7 @@ resource "aws_elb" "master" {
   }
   tags {
     Name              = "${var.cluster_name}_master"
-    KubernetesCluster = "${var.cluster_fqdn}"
+    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
   }
 }
 
@@ -79,13 +79,13 @@ resource "aws_elb" "master_internal" {
     timeout             = 5
   }
   tags = {
-    KubernetesCluster = "${var.cluster_fqdn}"
+    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
     Name              = "${var.cluster_name}_master_internal"
   }
 }
 
 resource "aws_route53_record" "master_elb" {
-  name = "api.${var.cluster_fqdn}"
+  name = "api.${data.template_file.cluster_fqdn.rendered}"
   type = "A"
 
   alias = {
@@ -103,7 +103,7 @@ resource "aws_security_group" "master" {
   description = "${var.cluster_name} master"
   tags = {
     Name              = "${var.cluster_name}_master"
-    KubernetesCluster = "${var.cluster_fqdn}"
+    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
   }
 
   egress {
@@ -166,7 +166,7 @@ data "template_file" "master_user_data" {
   count    = "${data.template_file.master_resource_count.rendered}"
   template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
   vars {
-    cluster_fqdn           = "${var.cluster_fqdn}"
+    cluster_fqdn           = "${data.template_file.cluster_fqdn.rendered}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
     autoscaling_group_name = "master-${element(sort(data.aws_availability_zones.available.names), count.index)}"
     kubernetes_master_tag  = "- _kubernetes_master"
@@ -211,8 +211,8 @@ resource "aws_ebs_volume" "etcd-events" {
   encrypted         = false
 
   tags = {
-    KubernetesCluster    = "${var.cluster_fqdn}"
-    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-events.${var.cluster_fqdn}"
+    KubernetesCluster    = "${data.template_file.cluster_fqdn.rendered}"
+    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-events.${data.template_file.cluster_fqdn.rendered}"
     "k8s.io/etcd/events" = "${element(split(",", data.template_file.az_letters.rendered), count.index)}/${data.template_file.etcd_azs.rendered}"
     "k8s.io/role/master" = "1"
   }
@@ -226,8 +226,8 @@ resource "aws_ebs_volume" "etcd-main" {
   encrypted         = false
 
   tags = {
-    KubernetesCluster    = "${var.cluster_fqdn}"
-    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-main.${var.cluster_fqdn}"
+    KubernetesCluster    = "${data.template_file.cluster_fqdn.rendered}"
+    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-main.${data.template_file.cluster_fqdn.rendered}"
     "k8s.io/etcd/main"   = "${element(split(",", data.template_file.az_letters.rendered), count.index)}/${data.template_file.etcd_azs.rendered}"
     "k8s.io/role/master" = "1"
   }

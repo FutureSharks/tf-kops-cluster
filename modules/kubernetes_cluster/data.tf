@@ -27,6 +27,14 @@ data "aws_ami" "k8s_1_6_debian_jessie_ami" {
   }
 }
 
+# This removes '.' if it is the last character
+data "template_file" "cluster_fqdn" {
+  template = "$${cluster_fqdn}"
+  vars {
+    cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
+  }
+}
+
 data "template_file" "az_letters" {
   template = "$${az_letters}"
   vars {
