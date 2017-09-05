@@ -2,7 +2,7 @@ resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
   count                = "${data.template_file.master_resource_count.rendered}"
   name                 = "${var.cluster_name}_master_${element(split(",", data.template_file.az_letters.rendered), count.index)}"
-  vpc_zone_identifier  = ["${element(var.vpc_public_subnet_ids, count.index)}"]
+  vpc_zone_identifier  = ["${element(aws_subnet.public.*.id, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = [
     "${aws_elb.master.name}",
@@ -33,7 +33,7 @@ resource "aws_autoscaling_group" "master" {
 
 resource "aws_elb" "master" {
   name            = "${var.cluster_name}-master"
-  subnets         = ["${var.vpc_public_subnet_ids}"]
+  subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = [
     "${aws_security_group.master_elb.id}",
     "${var.sg_allow_http_s}"
@@ -59,7 +59,7 @@ resource "aws_elb" "master" {
 
 resource "aws_elb" "master_internal" {
   name         = "${var.cluster_name}-master-internal"
-  subnets      = ["${var.vpc_private_subnet_ids}"]
+  subnets      = ["${aws_subnet.private.*.id}"]
   internal     = true
   idle_timeout = 300
   listener = {
