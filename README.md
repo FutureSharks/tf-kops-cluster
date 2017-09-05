@@ -16,7 +16,7 @@ Pull requests welcome.
 
 ## Example
 
-```
+```hcl
 module "cluster1" {
   source                      = "modules/kubernetes_cluster"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"

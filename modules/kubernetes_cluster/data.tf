@@ -1,3 +1,7 @@
+terraform = {
+  required_version = ">= 0.9.3"
+}
+
 data "aws_availability_zones" "available" {}
 
 data "aws_region" "current" {
@@ -20,6 +24,14 @@ data "aws_ami" "k8s_1_6_debian_jessie_ami" {
   filter {
     name   = "state"
     values = ["available"]
+  }
+}
+
+# This removes '.' if it is the last character
+data "template_file" "cluster_fqdn" {
+  template = "$${cluster_fqdn}"
+  vars {
+    cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
   }
 }
 

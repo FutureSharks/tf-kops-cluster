@@ -19,7 +19,7 @@ resource "aws_autoscaling_group" "node" {
 
   tag = {
     key                 = "KubernetesCluster"
-    value               = "${var.cluster_fqdn}"
+    value               = "${data.template_file.cluster_fqdn.rendered}"
     propagate_at_launch = true
   }
 
@@ -45,7 +45,7 @@ resource "aws_autoscaling_group" "node" {
 data "template_file" "node_user_data" {
   template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
   vars {
-    cluster_fqdn           = "${var.cluster_fqdn}"
+    cluster_fqdn           = "${data.template_file.cluster_fqdn.rendered}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
     autoscaling_group_name = "nodes"
     kubernetes_master_tag  = ""
@@ -69,7 +69,7 @@ resource "aws_launch_configuration" "node" {
 
   root_block_device = {
     volume_type           = "gp2"
-    volume_size           = 50
+    volume_size           = 128
     delete_on_termination = true
   }
 
@@ -84,7 +84,7 @@ resource "aws_security_group" "node" {
   description = "Kubernetes cluster ${var.cluster_name} nodes"
 
   tags = {
-    KubernetesCluster = "${var.cluster_fqdn}"
+    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
     Name              = "${var.cluster_name}_node"
   }
 

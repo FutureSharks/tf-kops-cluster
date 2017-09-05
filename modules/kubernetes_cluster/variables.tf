@@ -28,7 +28,7 @@ variable "vpc_private_subnet_ids" {
 variable "master_iam_instance_profile" {}
 # Instance type for the master
 variable "master_instance_type" {
-  default = "m3.medium"
+  default = "t2.small"
 }
 # IAM instance profile to use for the nodes
 variable "node_iam_instance_profile" {}
@@ -50,7 +50,7 @@ variable "node_asg_max" {
 }
 # Kubernetes version tag to use
 variable "kubernetes_version" {
-  default = "1.6.2"
+  default = "1.7.0"
 }
 # Cloudwatch log group log retention in days
 variable "cloudwatch_log_group_retention" {
