@@ -16,22 +16,26 @@ variable "instance_key_name" {}
 variable "sg_allow_ssh" {}
 # Security group ID to allow HTTP/S from. Master ELB is added to this security group
 variable "sg_allow_http_s" {}
-# A list of public subnet IDs
-variable "vpc_public_subnet_ids" {
-  type = "list"
-}
-# A list of private subnet IDs
-variable "vpc_private_subnet_ids" {
-  type = "list"
-}
 # IAM instance profile to use for the master
 variable "master_iam_instance_profile" {}
+# IAM instance profile to use for the nodes
+variable "node_iam_instance_profile" {}
+# Private route table ID
+variable "route_table_private_id" {}
+# Public route table ID
+variable "route_table_public_id" {}
+# A list of CIDR networks to use for public subnets. Should be 1 per AZ.
+variable "subnet_cidr_blocks_public" {
+  type = "list"
+}
+# A list of CIDR networks to use for private subnets. Should be 1 per AZ.
+variable "subnet_cidr_blocks_private" {
+  type = "list"
+}
 # Instance type for the master
 variable "master_instance_type" {
   default = "t2.small"
 }
-# IAM instance profile to use for the nodes
-variable "node_iam_instance_profile" {}
 # Instance type for nodes
 variable "node_instance_type" {
   default = "t2.medium"

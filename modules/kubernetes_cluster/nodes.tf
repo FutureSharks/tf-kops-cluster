@@ -5,7 +5,7 @@ resource "aws_autoscaling_group" "node" {
   max_size             = "${var.node_asg_max}"
   min_size             = "${var.node_asg_min}"
   desired_capacity     = "${var.node_asg_desired}"
-  vpc_zone_identifier  = ["${var.vpc_public_subnet_ids}"]
+  vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
 
   # Ignore changes to autoscaling group min/max/desired as these attributes are
   # managed by the Kubernetes cluster autoscaler

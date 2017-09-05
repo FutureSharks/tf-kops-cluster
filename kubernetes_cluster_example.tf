@@ -21,8 +21,10 @@ module "cluster1" {
   kops_s3_bucket_id           = "${aws_s3_bucket.kops.id}"
   vpc_id                      = "${aws_vpc.main_vpc.id}"
   instance_key_name           = "default-key"
-  vpc_public_subnet_ids       = ["${aws_subnet.public.*.id}"]
-  vpc_private_subnet_ids      = ["${aws_subnet.private.*.id}"]
+  route_table_public_id       = "${aws_route_table.public.id}"
+  route_table_private_id      = "${aws_route_table.private.id}"
+  subnet_cidr_blocks_public   = ["${data.template_file.cluster1_public_cidr.*.rendered}"]
+  subnet_cidr_blocks_private  = ["${data.template_file.cluster1_private_cidr.*.rendered}"]
   node_asg_desired            = 1
   node_asg_min                = 1
   node_asg_max                = 1
@@ -31,6 +33,22 @@ module "cluster1" {
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
   dns                         = "private"
+}
+
+data "template_file" "cluster1_private_cidr" {
+  count    = "${length(data.aws_availability_zones.available.names)}"
+  template = "$${cluster1_private_cidr}"
+  vars {
+    cluster1_private_cidr = "${cidrsubnet(aws_vpc.main_vpc.cidr_block, 8, count.index)}"
+  }
+}
+
+data "template_file" "cluster1_public_cidr" {
+  count    = "${length(data.aws_availability_zones.available.names)}"
+  template = "$${cluster1_public_cidr}"
+  vars {
+    cluster1_public_cidr = "${cidrsubnet(aws_vpc.main_vpc.cidr_block, 8, count.index + length(data.aws_availability_zones.available.names))}"
+  }
 }
 
 resource "aws_vpc" "main_vpc" {
@@ -86,40 +104,6 @@ resource "aws_route_table" "private" {
   tags {
     "Name" = "private"
   }
-}
-
-resource "aws_subnet" "public" {
-  count                   = "${length(data.aws_availability_zones.available.names)}"
-  vpc_id                  = "${aws_vpc.main_vpc.id}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main_vpc.cidr_block, 7, count.index)}"
-  availability_zone       = "${element(data.aws_availability_zones.available.names, count.index)}"
-  map_public_ip_on_launch = true
-  tags {
-    "Name" = "public ${element(split(",", "a,b,c"), count.index)}"
-  }
-}
-
-resource "aws_subnet" "private" {
-  count                   = "${length(data.aws_availability_zones.available.names)}"
-  vpc_id                  = "${aws_vpc.main_vpc.id}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main_vpc.cidr_block, 7, count.index + length(data.aws_availability_zones.available.names))}"
-  availability_zone       = "${element(data.aws_availability_zones.available.names, count.index)}"
-  map_public_ip_on_launch = false
-  tags {
-    "Name" = "private ${element(split(",", "a,b,c"), count.index)}"
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  count          = "${length(data.aws_availability_zones.available.names)}"
-  route_table_id = "${aws_route_table.private.id}"
-  subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
-}
-
-resource "aws_route_table_association" "public" {
-  count          = "${length(data.aws_availability_zones.available.names)}"
-  route_table_id = "${aws_route_table.public.id}"
-  subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
 }
 
 resource "aws_security_group" "allow_ssh" {

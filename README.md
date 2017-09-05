@@ -45,4 +45,4 @@ If the `cluster_fqdn` is not resolvable from where you run `kubectl` then you ge
 
 ## Versions
 
-Currently kops version 1.6.2 is supported. When a new kops version is available and the user data scripts are changed, a tag will be created with this format: `kops_version`-`module_version`
+Currently kops version 1.7.0 is supported. When a new kops version is available and the user data scripts are changed, a tag will be created with this format: `kops_version`-`module_version`
