@@ -28,8 +28,18 @@ module "cluster1" {
   kops_s3_bucket_id           = "${aws_s3_bucket.kops.id}"
   vpc_id                      = "${aws_vpc.my_vpc.id}"
   instance_key_name           = "${aws_key_pair.my_keys.id}"
-  vpc_public_subnet_ids       = ["${aws_subnet.public.*.id}"]
-  vpc_private_subnet_ids      = ["${aws_subnet.private.*.id}"]
+  route_table_public_id       = "${aws_route_table.public.id}"
+  route_table_private_id      = "${aws_route_table.private.id}"
+  subnet_cidr_blocks_public   = [
+    "172.20.0.0/24",
+    "172.20.1.0/24",
+    "172.20.2.0/24"
+  ]
+  subnet_cidr_blocks_private  = [
+    "172.20.3.0/24",
+    "172.20.4.0/24",
+    "172.20.5.0/24"
+  ]
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
 }
@@ -41,7 +51,7 @@ Full example with VPC resources in [kubernetes_cluster_example.tf](kubernetes_cl
 
 ## Notes
 
-If the `cluster_fqdn` is not resolvable from where you run `kubectl` then you get an SSL error. The easiest solution is to use a public domain in Route53.
+If the `cluster_fqdn` is not resolvable from where you run `kubectl` then you get an SSL error. The easiest solution is to use a public domain in Route53 or use the `--insecure-skip-tls-verify` option for `kubectl`.
 
 ## Versions
 
