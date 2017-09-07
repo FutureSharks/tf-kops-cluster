@@ -55,7 +55,7 @@ data "template_file" "node_user_data" {
 
 resource "aws_launch_configuration" "node" {
   name_prefix                 = "${var.cluster_name}-node"
-  image_id                    = "${data.aws_ami.k8s_1_6_debian_jessie_ami.id}"
+  image_id                    = "${data.aws_ami.k8s_1_7_debian_jessie_ami.id}"
   instance_type               = "${var.node_instance_type}"
   key_name                    = "${var.instance_key_name}"
   iam_instance_profile        = "${var.node_iam_instance_profile}"

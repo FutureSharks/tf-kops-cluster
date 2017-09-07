@@ -54,7 +54,7 @@ variable "node_asg_max" {
 }
 # Kubernetes version tag to use
 variable "kubernetes_version" {
-  default = "1.7.0"
+  default = "1.7.2"
 }
 # Cloudwatch log group log retention in days
 variable "cloudwatch_log_group_retention" {
