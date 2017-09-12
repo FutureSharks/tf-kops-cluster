@@ -37,3 +37,6 @@ output "cloudwatch_log_group_name" {
 output "cloudwatch_log_group_arn" {
   value = "${aws_cloudwatch_log_group.cluster.arn}"
 }
+output "cluster_fqdn" {
+  value = "${data.template_file.cluster_fqdn.rendered}"
+}

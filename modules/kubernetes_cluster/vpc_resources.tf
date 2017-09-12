@@ -6,7 +6,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
   tags {
     "Name"              = "public ${var.cluster_name} ${element(split(",", "a,b,c"), count.index)}"
-    "KubernetesCluster" = "${var.cluster_fqdn}"
+    "KubernetesCluster" = "${data.template_file.cluster_fqdn.rendered}"
   }
 }
 
@@ -18,7 +18,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
   tags {
     "Name"              = "private ${var.cluster_name} ${element(split(",", "a,b,c"), count.index)}"
-    "KubernetesCluster" = "${var.cluster_fqdn}"
+    "KubernetesCluster" = "${data.template_file.cluster_fqdn.rendered}"
   }
 }
 
