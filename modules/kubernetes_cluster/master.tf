@@ -1,7 +1,7 @@
 resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
-  count                = "${data.template_file.master_resource_count.rendered}"
-  name                 = "${var.cluster_name}_master_${element(split(",", data.template_file.az_letters.rendered), count.index)}"
+  count                = "${local.master_resource_count}"
+  name                 = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
   vpc_zone_identifier  = ["${element(aws_subnet.public.*.id, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = [
@@ -14,13 +14,13 @@ resource "aws_autoscaling_group" "master" {
 
   tag = {
     key                 = "KubernetesCluster"
-    value               = "${data.template_file.cluster_fqdn.rendered}"
+    value               = "${local.cluster_fqdn}"
     propagate_at_launch = true
   }
 
   tag = {
     key                 = "Name"
-    value               = "${var.cluster_name}_master_${element(split(",", data.template_file.az_letters.rendered), count.index)}"
+    value               = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
     propagate_at_launch = true
   }
 
@@ -34,6 +34,7 @@ resource "aws_autoscaling_group" "master" {
 resource "aws_elb" "master" {
   name            = "${var.cluster_name}-master"
   subnets         = ["${aws_subnet.public.*.id}"]
+  idle_timeout    = 1200
   security_groups = [
     "${aws_security_group.master_elb.id}",
     "${var.sg_allow_http_s}"
@@ -53,7 +54,7 @@ resource "aws_elb" "master" {
   }
   tags {
     Name              = "${var.cluster_name}_master"
-    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
+    KubernetesCluster = "${local.cluster_fqdn}"
   }
 }
 
@@ -79,13 +80,13 @@ resource "aws_elb" "master_internal" {
     timeout             = 5
   }
   tags = {
-    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
+    KubernetesCluster = "${local.cluster_fqdn}"
     Name              = "${var.cluster_name}_master_internal"
   }
 }
 
 resource "aws_route53_record" "master_elb" {
-  name = "api.${data.template_file.cluster_fqdn.rendered}"
+  name = "api.${local.cluster_fqdn}"
   type = "A"
 
   alias = {
@@ -98,12 +99,12 @@ resource "aws_route53_record" "master_elb" {
 }
 
 resource "aws_security_group" "master" {
-  name        = "${var.cluster_name}_master"
+  name        = "${var.cluster_name}-master"
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master"
   tags = {
     Name              = "${var.cluster_name}_master"
-    KubernetesCluster = "${data.template_file.cluster_fqdn.rendered}"
+    KubernetesCluster = "${local.cluster_fqdn}"
   }
 
   egress {
@@ -163,19 +164,19 @@ resource "aws_security_group" "master_internal_elb" {
 }
 
 data "template_file" "master_user_data" {
-  count    = "${data.template_file.master_resource_count.rendered}"
+  count    = "${local.master_resource_count}"
   template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
   vars {
-    cluster_fqdn           = "${data.template_file.cluster_fqdn.rendered}"
+    cluster_fqdn           = "${local.cluster_fqdn}"
     kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "master-${element(sort(data.aws_availability_zones.available.names), count.index)}"
+    autoscaling_group_name = "master-${element(local.az_names, count.index)}"
     kubernetes_master_tag  = "- _kubernetes_master"
   }
 }
 
 resource "aws_launch_configuration" "master" {
-  count                = "${data.template_file.master_resource_count.rendered}"
-  name_prefix          = "${var.cluster_name}-master-${element(sort(data.aws_availability_zones.available.names), count.index)}-"
+  count                = "${local.master_resource_count}"
+  name_prefix          = "${var.cluster_name}-master-${element(local.az_names, count.index)}-"
   image_id             = "${data.aws_ami.k8s_1_7_debian_jessie_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
@@ -204,31 +205,31 @@ resource "aws_launch_configuration" "master" {
 }
 
 resource "aws_ebs_volume" "etcd-events" {
-  count             = "${data.template_file.master_resource_count.rendered}"
-  availability_zone = "${element(sort(data.aws_availability_zones.available.names), count.index)}"
+  count             = "${local.master_resource_count}"
+  availability_zone = "${element(local.az_names, count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
 
   tags = {
-    KubernetesCluster    = "${data.template_file.cluster_fqdn.rendered}"
-    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-events.${data.template_file.cluster_fqdn.rendered}"
-    "k8s.io/etcd/events" = "${element(split(",", data.template_file.az_letters.rendered), count.index)}/${data.template_file.etcd_azs.rendered}"
+    KubernetesCluster    = "${local.cluster_fqdn}"
+    Name                 = "${element(local.az_letters, count.index)}.etcd-events.${local.cluster_fqdn}"
+    "k8s.io/etcd/events" = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
     "k8s.io/role/master" = "1"
   }
 }
 
 resource "aws_ebs_volume" "etcd-main" {
-  count             = "${data.template_file.master_resource_count.rendered}"
-  availability_zone = "${element(sort(data.aws_availability_zones.available.names), count.index)}"
+  count             = "${local.master_resource_count}"
+  availability_zone = "${element(local.az_names, count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
 
   tags = {
-    KubernetesCluster    = "${data.template_file.cluster_fqdn.rendered}"
-    Name                 = "${element(split(",", data.template_file.az_letters.rendered), count.index)}.etcd-main.${data.template_file.cluster_fqdn.rendered}"
-    "k8s.io/etcd/main"   = "${element(split(",", data.template_file.az_letters.rendered), count.index)}/${data.template_file.etcd_azs.rendered}"
+    KubernetesCluster    = "${local.cluster_fqdn}"
+    Name                 = "${element(local.az_letters, count.index)}.etcd-main.${local.cluster_fqdn}"
+    "k8s.io/etcd/main"   = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
     "k8s.io/role/master" = "1"
   }
 }
