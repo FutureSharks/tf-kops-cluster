@@ -1,5 +1,5 @@
 terraform = {
-  required_version = ">= 0.9.3"
+  required_version = ">= 0.10.6"
 }
 
 data "aws_availability_zones" "available" {}
@@ -27,38 +27,17 @@ data "aws_ami" "k8s_1_7_debian_jessie_ami" {
   }
 }
 
-# This removes '.' if it is the last character
-data "template_file" "cluster_fqdn" {
-  template = "$${cluster_fqdn}"
-  vars {
-    cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
-  }
-}
-
-data "template_file" "az_letters" {
-  template = "$${az_letters}"
-  vars {
-    az_letters = "${ replace(join(",", sort(data.aws_availability_zones.available.names)), data.aws_region.current.name, "") }"
-  }
-}
-
-data "template_file" "master_resource_count" {
-   template = "$${master_resource_count}"
-   vars {
-     master_resource_count = "${var.force_single_master == 1 ? 1 : length(data.aws_availability_zones.available.names)}"
-   }
-}
-
-data "template_file" "master_azs" {
-   template = "$${master_azs}"
-   vars {
-     master_azs = "${var.force_single_master == 1 ? element(sort(data.aws_availability_zones.available.names), 0) : join(",", data.aws_availability_zones.available.names)}"
-   }
-}
-
-data "template_file" "etcd_azs" {
-   template = "$${etcd_azs}"
-   vars {
-     etcd_azs = "${var.force_single_master == 1 ? element(split(",", data.template_file.az_letters.rendered), 0) : data.template_file.az_letters.rendered}"
-   }
+locals {
+  # Removes the last character of the FQDN if it is '.'
+  cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
+  # AZ names and letters are used in tags and resources names
+  az_names = "${sort(data.aws_availability_zones.available.names)}"
+  az_letters_csv = "${replace(join(",", local.az_names), data.aws_region.current.name, "")}"
+  az_letters = "${split(",", local.az_letters_csv)}"
+  # Number master resources to create. Defaults to the number of AZs in the region but should be 1 for regions with odd number of AZs.
+  master_resource_count = "${var.force_single_master == 1 ? 1 : length(local.az_names)}"
+  # Master AZs is used in the `kops create cluster` command
+  master_azs = "${var.force_single_master == 1 ? element(local.az_names, 0) : join(",", local.az_names)}"
+  # etcd AZs is used in tags for the master EBS volumes
+  etcd_azs = "${var.force_single_master == 1 ? element(az_letters, 0) : local.az_letters_csv}"
 }
