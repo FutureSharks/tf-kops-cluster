@@ -40,4 +40,6 @@ locals {
   master_azs = "${var.force_single_master == 1 ? element(local.az_names, 0) : join(",", local.az_names)}"
   # etcd AZs is used in tags for the master EBS volumes
   etcd_azs = "${var.force_single_master == 1 ? element(local.az_letters, 0) : local.az_letters_csv}"
+  # Master ELB subnet IDs also workaround for "conditional operator cannot be used with list values" TF error
+  master_elb_subnet_ids = "${var.use_public_subnets == 1 ? join(",", aws_subnet.k8s.*.id) : join(",", var.public_subnet_ids)}"
 }

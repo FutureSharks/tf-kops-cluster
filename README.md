@@ -1,6 +1,6 @@
 # Terraform module for kops
 
-This module allows you to better integrate kops created Kubernetes clusters into existing AWS/Terraform infrastructure.
+This module allows you to better integrate [kops](https://github.com/kubernetes/kops) Kubernetes clusters into existing AWS/Terraform infrastructure.
 
 One of the main problems with the Terraform output from kops is that it is too simplistic and creates many duplicated resources. This can make integrating the Terraform code into an existing and already complex Terraform code base challenging. Especially when you need multiple clusters.
 
@@ -11,6 +11,7 @@ This module aims to solve this by using a Terraform module and shared resources 
   - Security Groups
   - kops bucket
   - Instance profiles
+  - NAT gateway resources
 
 Pull requests welcome.
 
@@ -22,36 +23,41 @@ module "cluster1" {
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster1"
-  cluster_fqdn                = "cluster1.local"
+  cluster_fqdn                = "cluster1.mydomain.com"
   route53_zone_id             = "${aws_route53_zone.my_zone.id}"
   kops_s3_bucket_arn          = "${aws_s3_bucket.kops.arn}"
   kops_s3_bucket_id           = "${aws_s3_bucket.kops.id}"
-  vpc_id                      = "${aws_vpc.my_vpc.id}"
-  instance_key_name           = "${aws_key_pair.my_keys.id}"
-  route_table_public_id       = "${aws_route_table.public.id}"
-  route_table_private_id      = "${aws_route_table.private.id}"
-  subnet_cidr_blocks_public   = [
-    "172.20.0.0/24",
-    "172.20.1.0/24",
-    "172.20.2.0/24"
-  ]
-  subnet_cidr_blocks_private  = [
+  vpc_id                      = "${aws_vpc.main_vpc.id}"
+  instance_key_name           = "default-key"
+  route_table_ids             = ["${aws_route_table.public.id}"]
+  master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
+  node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
+  subnet_cidr_blocks          = [
     "172.20.3.0/24",
     "172.20.4.0/24",
     "172.20.5.0/24"
   ]
-  master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
-  node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
 }
 ```
 
 See comments in [modules/kubernetes_cluster/variables.tf](modules/kubernetes_cluster/variables.tf) for list of available options.
 
-Full example with VPC resources in [kubernetes_cluster_example.tf](kubernetes_cluster_example.tf). `terraform apply` can be run from the root of this repo to build example cluster with shared VPC and IAM resources.
+A full example with VPC resources in [example](example). `terraform apply` can be run from this directory to build 2 example clusters with shared VPC and IAM resources. `cluster1` uses public subnets and `cluster2` uses subnets with NAT gateways.
 
-## Notes
+Not that if you don't replace the variable `domain_name` with a public Route 53 zone then you will need to edit your local `~/.kube/config` file:
 
-If the `cluster_fqdn` is not resolvable from where you run `kubectl` then you get an SSL error. The easiest solution is to use a public domain in Route53 or use the `--insecure-skip-tls-verify` option for `kubectl`.
+```shell
+MASTER_ELB=$(terraform state show module.cluster1.aws_elb.master | grep dns_name | cut -f2 -d= | xargs)
+sed -i "s/api.cluster1.local.vpc/$MASTER_ELB/g" ~/.kube/config
+```
+
+And then use run `kubectl` with the `--insecure-skip-tls-verify` option:
+
+```shell
+kubectl --insecure-skip-tls-verify cluster-info
+Kubernetes master is running at https://cluster1-master-999999999.eu-west-1.elb.amazonaws.com
+KubeDNS is running at https://cluster1-master-999999999.eu-west-1.elb.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns/proxy
+```
 
 ## Versions
 

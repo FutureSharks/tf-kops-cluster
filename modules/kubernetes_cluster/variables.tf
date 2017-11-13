@@ -20,16 +20,8 @@ variable "sg_allow_http_s" {}
 variable "master_iam_instance_profile" {}
 # IAM instance profile to use for the nodes
 variable "node_iam_instance_profile" {}
-# Private route table ID
-variable "route_table_private_id" {}
-# Public route table ID
-variable "route_table_public_id" {}
-# A list of CIDR networks to use for public subnets. Should be 1 per AZ.
-variable "subnet_cidr_blocks_public" {
-  type = "list"
-}
-# A list of CIDR networks to use for private subnets. Should be 1 per AZ.
-variable "subnet_cidr_blocks_private" {
+# A list of CIDR networks to use for Kubernetes subnets. Should be 1 per AZ.
+variable "subnet_cidr_blocks" {
   type = "list"
 }
 # Instance type for the master
@@ -56,15 +48,30 @@ variable "node_asg_max" {
 variable "kubernetes_version" {
   default = "1.7.2"
 }
-# Cloudwatch log group log retention in days
-variable "cloudwatch_log_group_retention" {
-  default = 30
-}
-# kops DNS setting
-variable "dns" {
-  default = "public"
-}
-# Force single master. Can be used when a master per AZ is not required or if running in a region with only 2 AZs.
+# Force single master. Can be used when a master per AZ is not required or if running
+# in a region with only 2 AZs.
 variable "force_single_master" {
   default = false
+}
+
+#################################################################
+# VPC/network settings
+#################################################################
+# Default behaviour is to use public subnets
+
+# Set to false to use private subnets
+variable "use_public_subnets" {
+  default = true
+}
+# Route table IDs. This should be a single route table ID if `use_public_subnets` is
+# set to true or a list of private subnet IDs that are associated with routing tables
+# with default routes via a NAT gateway
+variable "route_table_ids" {
+  type = "list"
+}
+# List of public subnet IDs for ELB. Provide a list of public subnet IDs if `use_public_subnets`
+# is set to false, otherwise leave blank
+variable "public_subnet_ids" {
+  type = "list"
+  default = [""]
 }

@@ -2,12 +2,9 @@ resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
   count                = "${local.master_resource_count}"
   name                 = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
-  vpc_zone_identifier  = ["${element(aws_subnet.public.*.id, count.index)}"]
+  vpc_zone_identifier  = ["${element(aws_subnet.k8s.*.id, count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
-  load_balancers       = [
-    "${aws_elb.master.name}",
-    "${aws_elb.master_internal.name}"
-  ]
+  load_balancers       = ["${aws_elb.master.name}"]
   max_size         = 1
   min_size         = 1
   desired_capacity = 1
@@ -33,7 +30,7 @@ resource "aws_autoscaling_group" "master" {
 
 resource "aws_elb" "master" {
   name            = "${var.cluster_name}-master"
-  subnets         = ["${aws_subnet.public.*.id}"]
+  subnets         = ["${split(",", local.master_elb_subnet_ids)}"]
   idle_timeout    = 1200
   security_groups = [
     "${aws_security_group.master_elb.id}",
@@ -55,33 +52,6 @@ resource "aws_elb" "master" {
   tags {
     Name              = "${var.cluster_name}_master"
     KubernetesCluster = "${local.cluster_fqdn}"
-  }
-}
-
-resource "aws_elb" "master_internal" {
-  name         = "${var.cluster_name}-master-internal"
-  subnets      = ["${aws_subnet.private.*.id}"]
-  internal     = true
-  idle_timeout = 300
-  listener = {
-    instance_port     = 443
-    instance_protocol = "TCP"
-    lb_port           = 443
-    lb_protocol       = "TCP"
-  }
-  security_groups = [
-    "${aws_security_group.master_internal_elb.id}",
-  ]
-  health_check = {
-    target              = "TCP:443"
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 10
-    timeout             = 5
-  }
-  tags = {
-    KubernetesCluster = "${local.cluster_fqdn}"
-    Name              = "${var.cluster_name}_master_internal"
   }
 }
 
@@ -124,15 +94,6 @@ resource "aws_security_group_rule" "master_elb_to_master" {
   protocol                 = "tcp"
 }
 
-resource "aws_security_group_rule" "internal_master_elb_to_master" {
-  type                     = "ingress"
-  security_group_id        = "${aws_security_group.master.id}"
-  source_security_group_id = "${aws_security_group.master_internal_elb.id}"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-}
-
 resource "aws_security_group" "master_elb" {
   name        = "${var.cluster_name}-master-elb"
   vpc_id      = "${var.vpc_id}"
@@ -145,21 +106,6 @@ resource "aws_security_group" "master_elb" {
   }
   tags {
     Name = "${var.cluster_name}_master_elb"
-  }
-}
-
-resource "aws_security_group" "master_internal_elb" {
-  name        = "${var.cluster_name}-master-internal-elb"
-  vpc_id      = "${var.vpc_id}"
-  description = "${var.cluster_name} master internal ELB"
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags {
-    Name = "${var.cluster_name}_master_internal_elb"
   }
 }
 
