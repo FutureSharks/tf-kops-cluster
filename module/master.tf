@@ -123,7 +123,7 @@ data "template_file" "master_user_data" {
 resource "aws_launch_configuration" "master" {
   count                = "${local.master_resource_count}"
   name_prefix          = "${var.cluster_name}-master-${element(local.az_names, count.index)}-"
-  image_id             = "${data.aws_ami.k8s_1_7_debian_jessie_ami.id}"
+  image_id             = "${data.aws_ami.k8s_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
   iam_instance_profile = "${var.master_iam_instance_profile}"

@@ -46,7 +46,7 @@ variable "node_asg_max" {
 }
 # Kubernetes version tag to use
 variable "kubernetes_version" {
-  default = "1.7.2"
+  default = "1.7.10"
 }
 # Force single master. Can be used when a master per AZ is not required or if running
 # in a region with only 2 AZs.
