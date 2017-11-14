@@ -61,4 +61,4 @@ KubeDNS is running at https://cluster1-master-999999999.eu-west-1.elb.amazonaws.
 
 ## Versions
 
-Currently kops version 1.7.2 is supported. When a new kops version is available and the user data scripts are changed, a tag will be created with this format: `kops_version`-`module_version`
+Currently kops version 1.7.1 is supported.
