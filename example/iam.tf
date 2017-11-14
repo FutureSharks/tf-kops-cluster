@@ -1,15 +1,3 @@
-resource "random_id" "s3_suffix" {
-  byte_length = 3
-}
-
-resource "aws_s3_bucket" "kops" {
-  bucket        = "kops-state-store-${random_id.s3_suffix.dec}"
-  acl           = "private"
-  versioning {
-    enabled = true
-  }
-}
-
 resource "aws_iam_instance_profile" "kubernetes_masters" {
   name = "kubernetes_masters"
   role = "${aws_iam_role.kubernetes_masters.name}"
