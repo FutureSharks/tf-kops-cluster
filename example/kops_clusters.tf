@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "kops" {
 }
 
 module "cluster1" {
-  source                      = "../modules/kubernetes_cluster"
+  source                      = "../module"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster1"
@@ -34,7 +34,7 @@ module "cluster1" {
 }
 
 module "cluster2" {
-  source                      = "../modules/kubernetes_cluster"
+  source                      = "../module"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster2"

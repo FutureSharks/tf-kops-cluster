@@ -19,7 +19,7 @@ Pull requests welcome.
 
 ```hcl
 module "cluster1" {
-  source                      = "modules/kubernetes_cluster"
+  source                      = "github.com/FutureSharks/tf-kops-cluster/module"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster1"
@@ -40,7 +40,7 @@ module "cluster1" {
 }
 ```
 
-See comments in [modules/kubernetes_cluster/variables.tf](modules/kubernetes_cluster/variables.tf) for list of available options.
+See comments in [module/variables.tf](module/variables.tf) for list of available options.
 
 A full example with VPC resources in [example](example). `terraform apply` can be run from this directory to build 2 example clusters with shared VPC and IAM resources. `cluster1` uses public subnets and `cluster2` uses subnets with NAT gateways.
 
