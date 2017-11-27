@@ -1,15 +1,5 @@
-resource "random_id" "s3_suffix" {
-  byte_length = 3
-}
-
-resource "aws_s3_bucket" "kops" {
-  bucket        = "kops-state-store-${random_id.s3_suffix.dec}"
-  acl           = "private"
-  force_destroy = true
-  versioning {
-    enabled = true
-  }
-}
+################################################################################
+# Cluster using public subnets
 
 module "cluster1" {
   source                      = "../module"
@@ -29,9 +19,12 @@ module "cluster1" {
   node_instance_type          = "t2.small"
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
-  subnet_cidr_blocks          = ["${data.template_file.cluster1_cidr_blocks.*.rendered}"]
-  route_table_ids             = ["${aws_route_table.public.id}"]
+  internet_gateway_id         = "${aws_internet_gateway.public.id}"
+  public_subnet_cidr_blocks   = ["${local.cluster1_public_subnet_cidr_blocks}"]
 }
+
+################################################################################
+# Cluster using private subnets
 
 module "cluster2" {
   source                      = "../module"
@@ -44,7 +37,6 @@ module "cluster2" {
   kops_s3_bucket_id           = "${aws_s3_bucket.kops.id}"
   vpc_id                      = "${aws_vpc.main_vpc.id}"
   instance_key_name           = "default-key"
-  subnet_cidr_blocks          = ["${data.template_file.cluster2_cidr_blocks.*.rendered}"]
   node_asg_desired            = 1
   node_asg_min                = 1
   node_asg_max                = 1
@@ -52,7 +44,20 @@ module "cluster2" {
   node_instance_type          = "t2.small"
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
-  route_table_ids             = ["${aws_route_table.nat_private.*.id}"]
-  use_public_subnets          = false
-  public_subnet_ids           = ["${aws_subnet.public.*.id}"]
+  internet_gateway_id         = "${aws_internet_gateway.public.id}"
+  public_subnet_cidr_blocks   = ["${local.cluster2_public_subnet_cidr_blocks}"]
+  private_subnet_ids          = ["${aws_subnet.nat_private.*.id}"]
+}
+
+resource "random_id" "s3_suffix" {
+  byte_length = 3
+}
+
+resource "aws_s3_bucket" "kops" {
+  bucket        = "kops-state-store-${random_id.s3_suffix.dec}"
+  acl           = "private"
+  force_destroy = true
+  versioning {
+    enabled = true
+  }
 }

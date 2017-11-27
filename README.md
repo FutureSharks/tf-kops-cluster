@@ -13,6 +13,15 @@ This module aims to solve this by using a Terraform module and shared resources 
   - Instance profiles
   - NAT gateway resources
 
+The module will create these resources per cluster:
+
+  - Autoscaling groups and launch configuration for nodes
+  - Autoscaling groups and launch configuration for masters (per AZ)
+  - Master ELB
+  - Public subnets (per AZ) for ELBs
+  - Security groups
+  - Etcd volumes used by masters (per AZ)
+
 Pull requests welcome.
 
 ## Example
@@ -32,7 +41,8 @@ module "cluster1" {
   route_table_ids             = ["${aws_route_table.public.id}"]
   master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
-  subnet_cidr_blocks          = [
+  internet_gateway_id         = "${aws_internet_gateway.public.id}"
+  public_subnet_cidr_blocks   = [
     "172.20.3.0/24",
     "172.20.4.0/24",
     "172.20.5.0/24"
