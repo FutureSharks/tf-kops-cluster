@@ -31,6 +31,9 @@ output "master_asg_arn" {
 output "cluster_fqdn" {
   value = "${local.cluster_fqdn}"
 }
-output "cluster_subnet_ids" {
-  value = ["${aws_subnet.k8s.*.id}"]
+output "public_subnet_ids" {
+  value = ["${aws_subnet.public.*.id}"]
+}
+output "public_route_table_id" {
+  value = "${aws_route_table.public.id}"
 }

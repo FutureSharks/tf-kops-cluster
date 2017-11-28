@@ -68,18 +68,6 @@ data "aws_iam_policy_document" "kubernetes_nodes_aws_iam_role_policy" {
   statement {
     effect  = "Allow"
     actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:DescribeLogStreams",
-      "logs:DescribeLogGroups"
-    ]
-    resources = ["arn:aws:logs:*:*:*"]
-  }
-
-  statement {
-    effect  = "Allow"
-    actions = [
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
       "ecr:GetDownloadUrlForLayer",

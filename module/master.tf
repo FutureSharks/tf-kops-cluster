@@ -2,7 +2,7 @@ resource "aws_autoscaling_group" "master" {
   depends_on           = [ "null_resource.create_cluster" ]
   count                = "${local.master_resource_count}"
   name                 = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
-  vpc_zone_identifier  = ["${element(aws_subnet.k8s.*.id, count.index)}"]
+  vpc_zone_identifier  = ["${element(split(",", local.k8s_subnet_ids), count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = ["${aws_elb.master.name}"]
   max_size         = 1
@@ -30,7 +30,7 @@ resource "aws_autoscaling_group" "master" {
 
 resource "aws_elb" "master" {
   name            = "${var.cluster_name}-master"
-  subnets         = ["${split(",", local.master_elb_subnet_ids)}"]
+  subnets         = ["${aws_subnet.public.*.id}"]
   idle_timeout    = 1200
   security_groups = [
     "${aws_security_group.master_elb.id}",
