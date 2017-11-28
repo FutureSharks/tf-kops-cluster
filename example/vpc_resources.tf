@@ -51,15 +51,21 @@ resource "aws_vpc" "main_vpc" {
   }
 }
 
+resource "aws_route53_zone" "vpc_internal_zone" {
+  name          = "local.vpc"
+  comment       = "Internal zone"
+  vpc_id        = "${aws_vpc.main_vpc.id}"
+  force_destroy = true
+}
+
 resource "aws_route53_zone" "k8s_zone" {
   name          = "${var.domain_name}"
-  comment       = "Kops/Terraform example zone"
-  force_destroy = true
   vpc_id        = "${aws_vpc.main_vpc.id}"
+  force_destroy = true
 }
 
 resource "aws_vpc_dhcp_options" "dhcp_options" {
-  domain_name         = "${aws_route53_zone.k8s_zone.name}"
+  domain_name         = "${aws_route53_zone.vpc_internal_zone.name}"
   domain_name_servers = ["AmazonProvidedDNS"]
   tags {
     Name = "main_vpc_dhcp_options"

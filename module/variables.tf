@@ -60,3 +60,7 @@ variable "private_subnet_ids" {
   type = "list"
   default = []
 }
+# kops DNS mode
+variable "kops_dns_mode" {
+  default = "public"
+}

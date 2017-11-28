@@ -21,6 +21,7 @@ module "cluster1" {
   node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
   internet_gateway_id         = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks   = ["${local.cluster1_public_subnet_cidr_blocks}"]
+  kops_dns_mode               = "private"
 }
 
 ################################################################################
@@ -47,6 +48,7 @@ module "cluster2" {
   internet_gateway_id         = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks   = ["${local.cluster2_public_subnet_cidr_blocks}"]
   private_subnet_ids          = ["${aws_subnet.nat_private.*.id}"]
+  kops_dns_mode               = "private"
 }
 
 resource "random_id" "s3_suffix" {
