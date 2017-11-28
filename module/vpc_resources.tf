@@ -5,7 +5,7 @@ resource "aws_subnet" "public" {
   availability_zone       = "${element(local.az_names, count.index)}"
   map_public_ip_on_launch = true
   tags {
-    "Name"              = "k8s cluster ${var.cluster_name} ${element(local.az_letters, count.index)}"
+    "Name"              = "k8s cluster ${var.cluster_name} ${element(local.az_letters, count.index)} public"
     "KubernetesCluster" = "${local.cluster_fqdn}"
   }
 }
