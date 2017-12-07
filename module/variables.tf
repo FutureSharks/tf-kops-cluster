@@ -53,7 +53,7 @@ variable "node_asg_max" {
 }
 # Kubernetes version tag to use
 variable "kubernetes_version" {
-  default = "1.7.10"
+  default = "1.8.0"
 }
 # List of private subnet IDs. Pass 1 per AZ or if left blank then public subnets will be used.
 variable "private_subnet_ids" {
