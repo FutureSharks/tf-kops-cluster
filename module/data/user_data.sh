@@ -17,7 +17,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-NODEUP_URL=https://kubeupv2.s3.amazonaws.com/kops/1.7.1/linux/amd64/nodeup
+NODEUP_URL=https://kubeupv2.s3.amazonaws.com/kops/1.8.0/linux/amd64/nodeup
 NODEUP_HASH=
 
 
