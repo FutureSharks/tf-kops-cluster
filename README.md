@@ -81,4 +81,4 @@ In real use you should use a valid public Route53 zone and remove the private DN
 
 ## Versions
 
-Currently kops version 1.7.1 is supported.
+Currently kops version 1.8.0 is supported.
