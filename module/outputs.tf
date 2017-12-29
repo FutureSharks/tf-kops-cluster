@@ -37,3 +37,15 @@ output "public_subnet_ids" {
 output "public_route_table_id" {
   value = "${aws_route_table.public.id}"
 }
+output "masters_role_arn" {
+  value = "${aws_iam_role.masters.arn}"
+}
+output "masters_role_name" {
+  value = "${aws_iam_role.masters.name}"
+}
+output "nodes_role_arn" {
+  value = "${aws_iam_role.nodes.arn}"
+}
+output "nodes_role_name" {
+  value = "${aws_iam_role.nodes.name}"
+}

@@ -81,4 +81,8 @@ In real use you should use a valid public Route53 zone and remove the private DN
 
 ## Versions
 
-Currently kops version 1.7.1 is supported.
+Supported kops version: 1.8.0
+Supported Kubernetes versions:
+  - 1.7.10
+  - 1.8.0
+  - 1.8.4

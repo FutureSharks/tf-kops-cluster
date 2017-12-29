@@ -5,9 +5,9 @@ resource "aws_autoscaling_group" "master" {
   vpc_zone_identifier  = ["${element(split(",", local.k8s_subnet_ids), count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = ["${aws_elb.master.name}"]
-  max_size         = 1
-  min_size         = 1
-  desired_capacity = 1
+  max_size             = 1
+  min_size             = 1
+  desired_capacity     = 1
 
   tag = {
     key                 = "KubernetesCluster"
@@ -109,26 +109,14 @@ resource "aws_security_group" "master_elb" {
   }
 }
 
-data "template_file" "master_user_data" {
-  count    = "${local.master_resource_count}"
-  template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
-  vars {
-    cluster_fqdn           = "${local.cluster_fqdn}"
-    kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "master-${element(local.az_names, count.index)}"
-    kubernetes_master_tag  = "- _kubernetes_master"
-  }
-}
-
 resource "aws_launch_configuration" "master" {
   count                = "${local.master_resource_count}"
   name_prefix          = "${var.cluster_name}-master-${element(local.az_names, count.index)}-"
   image_id             = "${data.aws_ami.k8s_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
-  iam_instance_profile = "${var.master_iam_instance_profile}"
-  user_data            = "${file("${path.module}/data/user_data.sh")}${element(data.template_file.master_user_data.*.rendered, count.index)}"
-
+  iam_instance_profile = "${aws_iam_instance_profile.masters.name}"
+  user_data            = "${element(data.template_file.master_user_data_1.*.rendered, count.index)}${file("${path.module}/user_data/02_download_nodeup.sh")}${element(data.template_file.master_user_data_3.*.rendered, count.index)}${element(data.template_file.master_user_data_4.*.rendered, count.index)}${element(data.template_file.master_user_data_5.*.rendered, count.index)}"
   security_groups      = [
     "${aws_security_group.master.id}",
     "${var.sg_allow_ssh}"
