@@ -64,3 +64,7 @@ variable "kops_dns_mode" {
 variable "kubernetes_networking" {
   default = "flannel"
 }
+# kops authorization mode
+variable "authorization_mode" {
+  default = "AlwaysAllow"
+}
