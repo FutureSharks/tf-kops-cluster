@@ -33,7 +33,7 @@ variable "master_instance_type" {
 }
 # Instance type for nodes
 variable "node_instance_type" {
-  default = "t2.medium"
+  default = "c4.large"
 }
 # Node autoscaling group min
 variable "node_asg_min" {
@@ -51,7 +51,7 @@ variable "node_asg_max" {
 variable "kubernetes_version" {
   default = "1.8.4"
 }
-# List of private subnet IDs. Pass 1 per AZ or if left blank then public subnets will be used.
+# List of private subnet IDs. Pass 1 per AZ or if left blank then public subnets will be used
 variable "private_subnet_ids" {
   type = "list"
   default = []
@@ -60,11 +60,7 @@ variable "private_subnet_ids" {
 variable "kops_dns_mode" {
   default = "public"
 }
-# kops networking mode to use. Values other than flannel are untested.
+# kops networking mode to use. Values other than flannel and calico are untested
 variable "kubernetes_networking" {
-  default = "flannel"
-}
-# kops authorization mode
-variable "authorization_mode" {
-  default = "AlwaysAllow"
+  default = "calico"
 }

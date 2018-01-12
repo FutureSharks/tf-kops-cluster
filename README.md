@@ -2,25 +2,7 @@
 
 This module allows you to better integrate [kops](https://github.com/kubernetes/kops) Kubernetes clusters into existing AWS/Terraform infrastructure.
 
-One of the main problems with the Terraform output from kops is that it is too simplistic and creates many duplicated resources. This can make integrating the Terraform code into an existing and already complex Terraform code base challenging. Especially when you need multiple clusters.
-
-This module aims to solve this by using a Terraform module and shared resources to reduce duplication. Common resource that already exist in your AWS account can then be used:
-
-  - VPC
-  - IAM policies
-  - Security Groups
-  - kops bucket
-  - Instance profiles
-  - NAT gateway resources
-
-The module will create these resources per cluster:
-
-  - Autoscaling groups and launch configuration for nodes
-  - Autoscaling groups and launch configuration for masters (per AZ)
-  - Master ELB
-  - Public subnets (per AZ) for ELBs
-  - Security groups
-  - Etcd volumes used by masters (per AZ)
+It also allows you to create and destroy clusters quickly and easily like other Terraform resources.
 
 Pull requests welcome.
 
@@ -53,7 +35,7 @@ See comments in [module/variables.tf](module/variables.tf) for list of available
 
 A full example with VPC resources in [example](example). `terraform apply` can be run from this directory to build 2 example clusters with shared VPC and IAM resources. `cluster1` uses public subnets and `cluster2` uses private subnets with NAT gateways.
 
-Note that this example is using non-existent domain and private DNS mode so a configuration change is required to make it work:
+Note that this example is using non-existent domain and private DNS mode so a configuration change is required to connect to the Kubernetes API after creation:
 
 ```shell
 MASTER_ELB_CLUSTER1=$(terraform state show module.cluster1.aws_elb.master | grep dns_name | cut -f2 -d= | xargs)
@@ -79,9 +61,14 @@ ip-172-20-27-107.eu-west-1.compute.internal   Ready     master    2m        v1.7
 
 In real use you should use a valid public Route53 zone and remove the private DNS mode option.
 
-## Versions
+## Supported settings
 
-Supported kops version: 1.8.0
+Authentication: RBAC only
+
+Networking: calico or flannel
+
+Kops version: 1.8.0
+
 Supported Kubernetes versions:
   - 1.7.10
   - 1.8.0
