@@ -16,10 +16,6 @@ variable "instance_key_name" {}
 variable "sg_allow_ssh" {}
 # Security group ID to allow HTTP/S from. Master ELB is added to this security group
 variable "sg_allow_http_s" {}
-# IAM instance profile to use for the master
-variable "master_iam_instance_profile" {}
-# IAM instance profile to use for the nodes
-variable "node_iam_instance_profile" {}
 # ID of internet gateway for the VPC
 variable "internet_gateway_id" {}
 # A list of CIDR subnet blocks to use for Kubernetes public subnets. Should be 1 per AZ.
@@ -33,7 +29,7 @@ variable "force_single_master" {
 }
 # Instance type for the master
 variable "master_instance_type" {
-  default = "t2.small"
+  default = "m4.medium"
 }
 # Instance type for nodes
 variable "node_instance_type" {
@@ -53,7 +49,7 @@ variable "node_asg_max" {
 }
 # Kubernetes version tag to use
 variable "kubernetes_version" {
-  default = "1.7.10"
+  default = "1.8.4"
 }
 # List of private subnet IDs. Pass 1 per AZ or if left blank then public subnets will be used.
 variable "private_subnet_ids" {
@@ -63,4 +59,12 @@ variable "private_subnet_ids" {
 # kops DNS mode
 variable "kops_dns_mode" {
   default = "public"
+}
+# kops networking mode to use. Values other than flannel are untested.
+variable "kubernetes_networking" {
+  default = "flannel"
+}
+# kops authorization mode
+variable "authorization_mode" {
+  default = "AlwaysAllow"
 }

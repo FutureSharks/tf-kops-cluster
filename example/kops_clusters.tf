@@ -3,6 +3,7 @@
 
 module "cluster1" {
   source                      = "../module"
+  kubernetes_version          = "1.8.4"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster1"
@@ -17,8 +18,6 @@ module "cluster1" {
   node_asg_max                = 1
   master_instance_type        = "t2.small"
   node_instance_type          = "t2.small"
-  master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
-  node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
   internet_gateway_id         = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks   = ["${local.cluster1_public_subnet_cidr_blocks}"]
   kops_dns_mode               = "private"
@@ -29,6 +28,7 @@ module "cluster1" {
 
 module "cluster2" {
   source                      = "../module"
+  kubernetes_version          = "1.7.10"
   sg_allow_ssh                = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s             = "${aws_security_group.allow_http.id}"
   cluster_name                = "cluster2"
@@ -43,8 +43,6 @@ module "cluster2" {
   node_asg_max                = 1
   master_instance_type        = "t2.small"
   node_instance_type          = "t2.small"
-  master_iam_instance_profile = "${aws_iam_instance_profile.kubernetes_masters.id}"
-  node_iam_instance_profile   = "${aws_iam_instance_profile.kubernetes_nodes.id}"
   internet_gateway_id         = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks   = ["${local.cluster2_public_subnet_cidr_blocks}"]
   private_subnet_ids          = ["${aws_subnet.nat_private.*.id}"]

@@ -42,30 +42,17 @@ resource "aws_autoscaling_group" "node" {
   }
 }
 
-data "template_file" "node_user_data" {
-  template = "${file("${path.module}/data/nodeup_node_config.tpl")}"
-  vars {
-    cluster_fqdn           = "${local.cluster_fqdn}"
-    kops_s3_bucket_id      = "${var.kops_s3_bucket_id}"
-    autoscaling_group_name = "nodes"
-    kubernetes_master_tag  = ""
-
-  }
-}
-
 resource "aws_launch_configuration" "node" {
   name_prefix                 = "${var.cluster_name}-node"
   image_id                    = "${data.aws_ami.k8s_ami.id}"
   instance_type               = "${var.node_instance_type}"
   key_name                    = "${var.instance_key_name}"
-  iam_instance_profile        = "${var.node_iam_instance_profile}"
+  iam_instance_profile        = "${aws_iam_instance_profile.nodes.name}"
+  user_data                   = "${element(data.template_file.node_user_data_1.*.rendered, count.index)}${file("${path.module}/user_data/02_download_nodeup.sh")}${element(data.template_file.node_user_data_3.*.rendered, count.index)}${element(data.template_file.node_user_data_4.*.rendered, count.index)}${element(data.template_file.node_user_data_5.*.rendered, count.index)}"
   security_groups             = [
     "${aws_security_group.node.id}",
     "${var.sg_allow_ssh}"
   ]
-
-  user_data                   = "${file("${path.module}/data/user_data.sh")}${data.template_file.node_user_data.rendered}"
-
   root_block_device = {
     volume_type           = "gp2"
     volume_size           = 128
