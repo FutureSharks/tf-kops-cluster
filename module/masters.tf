@@ -1,7 +1,7 @@
 resource "aws_autoscaling_group" "master" {
-  depends_on           = [ "null_resource.create_cluster" ]
-  count                = "${local.master_resource_count}"
-  name                 = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
+  depends_on           = ["null_resource.create_cluster"]
+  count                = "${length(local.master_azs)}"
+  name                 = "${var.cluster_name}_master_${element(local.master_azs_letters, count.index)}"
   vpc_zone_identifier  = ["${element(split(",", local.k8s_subnet_ids), count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
   load_balancers       = ["${aws_elb.master.name}"]
@@ -17,7 +17,7 @@ resource "aws_autoscaling_group" "master" {
 
   tag = {
     key                 = "Name"
-    value               = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
+    value               = "${var.cluster_name}_master_${element(local.master_azs_letters, count.index)}"
     propagate_at_launch = true
   }
 
@@ -29,19 +29,22 @@ resource "aws_autoscaling_group" "master" {
 }
 
 resource "aws_elb" "master" {
-  name            = "${var.cluster_name}-master"
-  subnets         = ["${aws_subnet.public.*.id}"]
-  idle_timeout    = 1200
+  name         = "${var.cluster_name}-master"
+  subnets      = ["${aws_subnet.public.*.id}"]
+  idle_timeout = 1200
+
   security_groups = [
     "${aws_security_group.master_elb.id}",
-    "${var.sg_allow_http_s}"
+    "${var.sg_allow_http_s}",
   ]
+
   listener {
     instance_port     = 443
     instance_protocol = "tcp"
     lb_port           = 443
     lb_protocol       = "tcp"
   }
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -49,6 +52,7 @@ resource "aws_elb" "master" {
     target              = "TCP:443"
     interval            = 30
   }
+
   tags {
     Name              = "${var.cluster_name}_master"
     KubernetesCluster = "${local.cluster_fqdn}"
@@ -72,6 +76,7 @@ resource "aws_security_group" "master" {
   name        = "${var.cluster_name}-master"
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master"
+
   tags = {
     Name              = "${var.cluster_name}_master"
     KubernetesCluster = "${local.cluster_fqdn}"
@@ -98,28 +103,31 @@ resource "aws_security_group" "master_elb" {
   name        = "${var.cluster_name}-master-elb"
   vpc_id      = "${var.vpc_id}"
   description = "${var.cluster_name} master ELB"
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   tags {
     Name = "${var.cluster_name}_master_elb"
   }
 }
 
 resource "aws_launch_configuration" "master" {
-  count                = "${local.master_resource_count}"
-  name_prefix          = "${var.cluster_name}-master-${element(local.az_names, count.index)}-"
+  count                = "${length(local.master_azs)}"
+  name_prefix          = "${var.cluster_name}-master-${element(local.master_azs, count.index)}-"
   image_id             = "${data.aws_ami.k8s_ami.id}"
   instance_type        = "${var.master_instance_type}"
   key_name             = "${var.instance_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.masters.name}"
   user_data            = "${element(data.template_file.master_user_data_1.*.rendered, count.index)}${file("${path.module}/user_data/02_download_nodeup.sh")}${element(data.template_file.master_user_data_3.*.rendered, count.index)}${element(data.template_file.master_user_data_4.*.rendered, count.index)}${element(data.template_file.master_user_data_5.*.rendered, count.index)}"
-  security_groups      = [
+
+  security_groups = [
     "${aws_security_group.master.id}",
-    "${var.sg_allow_ssh}"
+    "${var.sg_allow_ssh}",
   ]
 
   root_block_device = {
@@ -139,31 +147,31 @@ resource "aws_launch_configuration" "master" {
 }
 
 resource "aws_ebs_volume" "etcd-events" {
-  count             = "${local.master_resource_count}"
-  availability_zone = "${element(local.az_names, count.index)}"
+  count             = "${length(local.master_azs)}"
+  availability_zone = "${element(local.master_azs, count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
 
   tags = {
     KubernetesCluster    = "${local.cluster_fqdn}"
-    Name                 = "${element(local.az_letters, count.index)}.etcd-events.${local.cluster_fqdn}"
-    "k8s.io/etcd/events" = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
+    Name                 = "${element(local.master_azs_letters, count.index)}.etcd-events.${local.cluster_fqdn}"
+    "k8s.io/etcd/events" = "${element(local.master_azs_letters, count.index)}/${local.etcd_azs}"
     "k8s.io/role/master" = "1"
   }
 }
 
 resource "aws_ebs_volume" "etcd-main" {
-  count             = "${local.master_resource_count}"
-  availability_zone = "${element(local.az_names, count.index)}"
+  count             = "${length(local.master_azs)}"
+  availability_zone = "${element(local.master_azs, count.index)}"
   size              = 20
   type              = "gp2"
   encrypted         = false
 
   tags = {
     KubernetesCluster    = "${local.cluster_fqdn}"
-    Name                 = "${element(local.az_letters, count.index)}.etcd-main.${local.cluster_fqdn}"
-    "k8s.io/etcd/main"   = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
+    Name                 = "${element(local.master_azs_letters, count.index)}.etcd-main.${local.cluster_fqdn}"
+    "k8s.io/etcd/main"   = "${element(local.master_azs_letters, count.index)}/${local.etcd_azs}"
     "k8s.io/role/master" = "1"
   }
 }
