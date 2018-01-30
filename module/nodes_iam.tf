@@ -12,6 +12,7 @@ data "aws_iam_policy_document" "assume_role_policy_nodes" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
@@ -40,21 +41,25 @@ data "aws_iam_policy_document" "nodes" {
   }
 
   statement {
-    sid     = "kopsK8sS3GetListBucket"
-    effect  = "Allow"
+    sid    = "kopsK8sS3GetListBucket"
+    effect = "Allow"
+
     actions = [
       "s3:GetBucketLocation",
-      "s3:ListBucket"
+      "s3:ListBucket",
     ]
+
     resources = ["${var.kops_s3_bucket_arn}"]
   }
 
   statement {
-    sid     = "kopsK8sS3NodeBucketSelectiveGet"
-    effect  = "Allow"
+    sid    = "kopsK8sS3NodeBucketSelectiveGet"
+    effect = "Allow"
+
     actions = [
       "s3:Get*",
     ]
+
     resources = [
       "${var.kops_s3_bucket_arn}",
       "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/addons/*",
@@ -65,13 +70,14 @@ data "aws_iam_policy_document" "nodes" {
       "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/pki/private/kube-proxy/*",
       "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/pki/private/kubelet/*",
       "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/pki/ssh/*",
-      "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/secrets/dockerconfig"
+      "${var.kops_s3_bucket_arn}/${local.cluster_fqdn}/secrets/dockerconfig",
     ]
   }
 
   statement {
-    sid     = "kopsK8sECR"
-    effect  = "Allow"
+    sid    = "kopsK8sECR"
+    effect = "Allow"
+
     actions = [
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
@@ -79,8 +85,9 @@ data "aws_iam_policy_document" "nodes" {
       "ecr:GetRepositoryPolicy",
       "ecr:DescribeRepositories",
       "ecr:ListImages",
-      "ecr:BatchGetImage"
+      "ecr:BatchGetImage",
     ]
+
     resources = ["*"]
   }
 }
