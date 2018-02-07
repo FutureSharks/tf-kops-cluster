@@ -180,7 +180,7 @@ resource "aws_cloudwatch_metric_alarm" "master_cpu" {
   threshold           = "${var.master_k8s_cpu_threshold}"
 
   dimensions {
-    AutoScalingMaster = "${aws_autoscaling_group.master.name}"
+    AutoScalingGroupName = "${aws_autoscaling_group.master.name}"
   }
 }
 
@@ -196,7 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
   threshold           = 1500
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${aws_ebs_volume.etcd-events.id}"
   }
 }
 
@@ -212,7 +212,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
   threshold           = 1500
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${aws_ebs_volume.etcd-events.id}"
   }
 }
 
@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-events" {
   threshold           = 10
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${aws_ebs_volume.etcd-events.id}"
   }
 }
 
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
   threshold           = 1500
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${aws_ebs_volume.etcd-main.id}"
   }
 }
 
@@ -260,7 +260,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-mains" {
   threshold           = 5
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${aws_ebs_volume.etcd-main.id}"
   }
 }
 
@@ -276,6 +276,6 @@ resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-main" {
   threshold           = 10
 
   dimensions {
-    etcdEBSVolume = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${aws_ebs_volume.etcd-main.id}"
   }
 }
