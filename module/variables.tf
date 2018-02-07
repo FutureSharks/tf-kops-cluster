@@ -64,3 +64,7 @@ variable "kops_dns_mode" {
 variable "kubernetes_networking" {
   default = "calico"
 }
+# Cloudwatch alarm CPU
+variable "master_k8s_cpu_threshold" {
+  default = 80
+}
