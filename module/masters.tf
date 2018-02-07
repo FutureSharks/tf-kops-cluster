@@ -193,7 +193,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
   namespace           = "AWS/EBS"
   period              = "300"
   statistic           = "Sum"
-  threshold           = 1500
+  threshold           = 5000
 
   dimensions {
     VolumeId = "${aws_ebs_volume.etcd-events.id}"
@@ -209,7 +209,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
   namespace           = "AWS/EBS"
   period              = "300"
   statistic           = "Sum"
-  threshold           = 1500
+  threshold           = 5000
 
   dimensions {
     VolumeId = "${aws_ebs_volume.etcd-events.id}"
@@ -241,7 +241,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
   namespace           = "AWS/EBS"
   period              = "300"
   statistic           = "Sum"
-  threshold           = 1500
+  threshold           = 5000
 
   dimensions {
     VolumeId = "${aws_ebs_volume.etcd-main.id}"
