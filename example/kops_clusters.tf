@@ -58,6 +58,7 @@ resource "aws_s3_bucket" "kops" {
   bucket        = "kops-state-store-${random_id.s3_suffix.dec}"
   acl           = "private"
   force_destroy = true
+
   versioning {
     enabled = true
   }
