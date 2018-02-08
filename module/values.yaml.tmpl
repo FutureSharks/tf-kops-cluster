@@ -1,0 +1,12 @@
+# values.yaml for go templates
+cluster_fqdn: ${cluster_fqdn}
+kubernetes_version: ${kubernetes_version}
+kops_dns_mode: ${kops_dns_mode}
+kops_s3_bucket_id: ${kops_s3_bucket_id}
+kubernetes_networking: ${kubernetes_networking}
+zones: ${zones}
+node_asg_desired: ${node_asg_desired}
+master_azs: ${master_azs}
+vpc_id: ${vpc_id}
+kubeAPIServer:
+  ${k8s_apiserver_options}

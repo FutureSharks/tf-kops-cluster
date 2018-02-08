@@ -5,7 +5,7 @@ resource "null_resource" "check_kops_version" {
 }
 
 data "template_file" "tmpl_values" {
-  template = "${file("${path.module}/values.tmpl")}"
+  template = "${file("${path.module}/values.yaml.tmpl")}"
 
   vars {
     cluster_fqdn          = "${local.cluster_fqdn}"
@@ -35,7 +35,7 @@ resource "null_resource" "generate_template" {
   depends_on = ["null_resource.generate_values"]
 
   provisioner "local-exec" {
-    command = "kops toolbox template --values values.yaml --template ${path.module}/kops_template.tmpl --output cluster_config.yaml"
+    command = "kops toolbox template --values values.yaml --template ${path.module}/cluster_config.yaml.tmpl --output cluster_config.yaml"
   }
 }
 
