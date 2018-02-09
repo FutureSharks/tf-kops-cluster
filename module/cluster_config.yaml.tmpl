@@ -52,7 +52,7 @@ spec:
   subnets:
   {{- range $index, $zone := splitList "," .zones }}
   - cidr: 172.41.{{mul 32 (add $index 1)}}.0/19
-    name: {{$zone}}
-    type: public
-    zone: {{$zone}}
+    name: {{$zone | title}}
+    type: Public
+    zone: {{$zone | title}}
   {{- end}}
