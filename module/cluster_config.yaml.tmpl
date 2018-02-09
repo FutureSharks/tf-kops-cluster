@@ -11,7 +11,7 @@ spec:
   {{- end }}
   api:
     loadBalancer:
-      type: Public
+      type: public
   authorization:
     RBAC: {}
   channel: stable
@@ -53,6 +53,6 @@ spec:
   {{- range $index, $zone := splitList "," .zones }}
   - cidr: 172.41.{{mul 32 (add $index 1)}}.0/19
     name: {{$zone}}
-    type: Public
+    type: public
     zone: {{$zone}}
   {{- end}}
