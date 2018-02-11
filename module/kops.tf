@@ -17,6 +17,7 @@ data "template_file" "tmpl_values" {
     node_asg_desired      = "${var.node_asg_desired}"
     master_azs            = "${local.master_azs}"
     vpc_id                = "${var.vpc_id}"
+    ami_name              = "${local.ami_name}"
     k8s_apiserver_options = "${join("\n  ", compact(local.k8s_apiserver_options))}"
   }
 }
@@ -43,7 +44,7 @@ resource "null_resource" "create_cluster" {
   depends_on = ["null_resource.check_kops_version", "null_resource.generate_template"]
 
   provisioner "local-exec" {
-    command = "kops create -f cluster_config.yaml --state=s3://${var.kops_s3_bucket_id}"
+    command = "kops create -f cluster_config.yaml --state=s3://${var.kops_s3_bucket_id} && kops create secret --state=s3://vend-test-kops-sydney --name cluster.ap-southeast-2.test.vendhq.com sshpublickey admin -i ~/.ssh/id_rsa.pub && kops update cluster ${var.cluster_fqdn} --state=s3://${var.kops_s3_bucket_id} --target=terraform --yes"
   }
 
   provisioner "local-exec" {
