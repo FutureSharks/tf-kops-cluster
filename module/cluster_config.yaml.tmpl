@@ -11,7 +11,7 @@ spec:
   {{- end }}
   api:
     loadBalancer:
-      type: public
+      type: Public
   authorization:
     RBAC: {}
   channel: stable
@@ -46,13 +46,56 @@ spec:
   - 0.0.0.0/0
   topology:
     dns:
-      type: {{.kops_dns_mode}}
+      type: {{.kops_dns_mode | title}}
     masters: {{.kops_dns_mode}}
     nodes: {{.kops_dns_mode}}
   subnets:
   {{- range $index, $zone := splitList "," .zones }}
   - cidr: 172.41.{{mul 32 (add $index 1)}}.0/19
-    name: {{$zone | title}}
+    name: {{$zone}}
     type: Public
-    zone: {{$zone | title}}
+    zone: {{$zone}}
   {{- end}}
+
+---
+
+{{- range $index, $zone := splitList "," .zones }}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{$.cluster_fqdn}}
+  name:  master-{{$zone}}
+spec:
+  image: kope.io/{{$.ami_name}}
+  machineType: m3.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup:  master-{{$zone}}
+  role: Master
+  subnets:
+  - {{$zone}}
+
+---
+
+  {{- end }}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.cluster_fqdn}}
+  name: nodes
+spec:
+  image: kope.io/{{.ami_name}}
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  subnets:
+  {{- range $index, $zone := splitList "," .zones }}
+  - {{$zone}}
+  {{- end }}
