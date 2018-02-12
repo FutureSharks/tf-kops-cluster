@@ -1,18 +1,24 @@
 locals {
   # Currently support kops version
   supported_kops_version = "1.8.0"
+
   # Removes the last character of the FQDN if it is '.'
   cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
+
   # AZ names and letters are used in tags and resources names
-  az_names = "${sort(data.aws_availability_zones.available.names)}"
+  az_names       = "${sort(data.aws_availability_zones.available.names)}"
   az_letters_csv = "${replace(join(",", local.az_names), data.aws_region.current.name, "")}"
-  az_letters = "${split(",", local.az_letters_csv)}"
+  az_letters     = "${split(",", local.az_letters_csv)}"
+
   # Number master resources to create. Defaults to the number of AZs in the region but should be 1 for regions with odd number of AZs.
   master_resource_count = "${var.force_single_master == 1 ? 1 : length(local.az_names)}"
+
   # Master AZs is used in the `kops create cluster` command
   master_azs = "${var.force_single_master == 1 ? element(local.az_names, 0) : join(",", local.az_names)}"
+
   # etcd AZs is used in tags for the master EBS volumes
   etcd_azs = "${var.force_single_master == 1 ? element(local.az_letters, 0) : local.az_letters_csv}"
+
   # Subnet IDs to be used by k8s ASGs
   k8s_subnet_ids = "${length(var.private_subnet_ids) == 0 ? join(",", aws_subnet.public.*.id) : join(",", var.private_subnet_ids)}"
 }
@@ -29,6 +35,7 @@ locals {
       ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2017-12-02"
       docker_version = "1.13.1"
     }
+
     "1.8.0" = {
       kubelet_hash   = "4c7b8aafe652ae107c9131754a2ad4e9641a025b"
       kubectl_hash   = "006fd43085e6ba2dc6b35b89af4d68cee3f689c9"
@@ -39,6 +46,7 @@ locals {
       ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2017-12-02"
       docker_version = "1.13.1"
     }
+
     "1.7.10" = {
       kubelet_hash   = "4d38bdc8e850c05103348cee2cbffbddce62bcf8"
       kubectl_hash   = "4c174128ad3657bb09c5b3bd4a05565956b44744"

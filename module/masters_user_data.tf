@@ -1,6 +1,7 @@
 data "template_file" "master_user_data_1" {
   count    = "${local.master_resource_count}"
   template = "${file("${path.module}/user_data/01_nodeup_url.sh.tpl")}"
+
   vars {
     kops_version = "${local.supported_kops_version}"
   }
@@ -9,6 +10,7 @@ data "template_file" "master_user_data_1" {
 data "template_file" "master_user_data_3" {
   count    = "${local.master_resource_count}"
   template = "${file("${path.module}/user_data/03_master_cluster_spec.sh.tpl")}"
+
   vars {
     kubernetes_version = "${var.kubernetes_version}"
     master_count       = "${local.master_resource_count}"
@@ -20,6 +22,7 @@ data "template_file" "master_user_data_3" {
 data "template_file" "master_user_data_4" {
   count    = "${local.master_resource_count}"
   template = "${file("${path.module}/user_data/04_ig_spec.sh.tpl")}"
+
   vars {
     instance_group = "master-${element(local.az_names, count.index)}"
   }
@@ -28,6 +31,7 @@ data "template_file" "master_user_data_4" {
 data "template_file" "master_user_data_5" {
   count    = "${local.master_resource_count}"
   template = "${file("${path.module}/user_data/05_kube_env.sh.tpl")}"
+
   vars {
     kubernetes_version    = "${var.kubernetes_version}"
     kops_version          = "${local.supported_kops_version}"
