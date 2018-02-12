@@ -1,5 +1,5 @@
 ################################################################################
-# Cluster using public subnets authenticated using Google OIDC
+# Cluster using public subnets
 
 module "cluster1" {
   source                    = "../module"
@@ -22,12 +22,10 @@ module "cluster1" {
   public_subnet_cidr_blocks = ["${local.cluster1_public_subnet_cidr_blocks}"]
   kops_dns_mode             = "private"
   auditlog_logpath          = "/var/log/kube-apiserver-audit.log"
-  oidc_clientid             = "kubernetes"
-  oidc_issuerurl            = "https://accounts.google.com"
 }
 
 ################################################################################
-# Cluster using private subnets authenitcated using Heptio's AWS Authenticator
+# Cluster using private subnets
 
 module "cluster2" {
   source                    = "../module"
@@ -52,7 +50,6 @@ module "cluster2" {
   kops_dns_mode             = "private"
   kubernetes_networking     = "flannel"
   auditlog_logpath          = "/var/log/kube-apiserver-audit.log"
-  auth_webhook_config_file  = "/etc/kubernetes/heptio-authenticator-aws/kubeconfig.yaml"
 }
 
 resource "random_id" "s3_suffix" {
