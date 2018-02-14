@@ -1,6 +1,6 @@
 resource "null_resource" "check_kops_version" {
   provisioner "local-exec" {
-    command = "if [[ ! $(kops version | cut -d ' ' -f2 | cut -c 1-3 ) -eq ${local.supported_kops_version} ]]; then echo 'Unsupported kops version. Version ${local.supported_kops_version} must be used'; exit 1; fi"
+    command = "if [[ ! $(kops version | cut -d ' ' -f2 | cut -c 1-3 ) = ${local.supported_kops_version} ]]; then echo 'Unsupported kops version. Version ${local.supported_kops_version} must be used'; exit 1; fi"
   }
 }
 
