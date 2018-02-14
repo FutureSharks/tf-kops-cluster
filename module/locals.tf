@@ -1,6 +1,6 @@
 locals {
   # Currently support kops version
-  supported_kops_version = "1.8.0"
+  supported_kops_version = "1.8"
 
   # Removes the last character of the FQDN if it is '.'
   cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
