@@ -4,9 +4,7 @@ terraform = {
 
 data "aws_availability_zones" "available" {}
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 data "aws_ami" "k8s_ami" {
   most_recent = true

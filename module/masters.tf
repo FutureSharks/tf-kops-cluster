@@ -177,7 +177,8 @@ resource "aws_ebs_volume" "etcd-main" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "master_cpu" {
-  alarm_name          = "${var.cluster_name}_masters_k8s_cpu"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_masters_k8s_cpu"
   alarm_description   = "K8s masters cluster CPU utilization"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -188,12 +189,13 @@ resource "aws_cloudwatch_metric_alarm" "master_cpu" {
   threshold           = "${var.master_k8s_cpu_threshold}"
 
   dimensions {
-    AutoScalingGroupName = "${aws_autoscaling_group.master.name}"
+    AutoScalingGroupName = "${element(aws_autoscaling_group.master.*.name, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
-  alarm_name          = "${var.cluster_name}_etcd_events_ebs_write_IOPS"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_write_IOPS"
   alarm_description   = "Etcd Events EBS WriteOps"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -201,15 +203,16 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
   namespace           = "AWS/EBS"
   period              = "300"
   statistic           = "Sum"
-  threshold           = 5000
+  threshold           = 8000
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-events.*.id, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
-  alarm_name          = "${var.cluster_name}_etcd_events_ebs_queue_length"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_queue_length"
   alarm_description   = "Etcd Events EBS Volume Queue Length"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -220,12 +223,13 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
   threshold           = 5000
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-events.*.id, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-events" {
-  alarm_name          = "${var.cluster_name}_etcd_events_ebs_read_IOPS"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_read_IOPS"
   alarm_description   = "Etcd Events EBS ReadOps"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -236,12 +240,13 @@ resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-events" {
   threshold           = 10
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-events.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-events.*.id, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
-  alarm_name          = "${var.cluster_name}_etcd_main_ebs_write_IOPS"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_write_IOPS"
   alarm_description   = "Etcd Main EBS WriteOps"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -249,15 +254,16 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
   namespace           = "AWS/EBS"
   period              = "300"
   statistic           = "Sum"
-  threshold           = 5000
+  threshold           = 8000
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-main.*.id, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-mains" {
-  alarm_name          = "${var.cluster_name}_etcd_main_ebs_queue_length"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_queue_length"
   alarm_description   = "Etcd Main EBS Volume Queue Length"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -268,12 +274,13 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-mains" {
   threshold           = 5
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-main.*.id, count.index)}"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-main" {
-  alarm_name          = "${var.cluster_name}_etcd_main_ebs_read_IOPS"
+  count               = "${local.master_resource_count}"
+  alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_read_IOPS"
   alarm_description   = "Etcd Main EBS ReadOps"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -284,6 +291,6 @@ resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-main" {
   threshold           = 10
 
   dimensions {
-    VolumeId = "${aws_ebs_volume.etcd-main.id}"
+    VolumeId = "${element(aws_ebs_volume.etcd-main.*.id, count.index)}"
   }
 }
