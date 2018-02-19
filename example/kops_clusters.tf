@@ -21,6 +21,7 @@ module "cluster1" {
   internet_gateway_id       = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks = ["${local.cluster1_public_subnet_cidr_blocks}"]
   kops_dns_mode             = "private"
+  auditlog_logpath          = "/var/log/kube-apiserver-audit.log"
 }
 
 ################################################################################
@@ -48,6 +49,7 @@ module "cluster2" {
   private_subnet_ids        = ["${aws_subnet.nat_private.*.id}"]
   kops_dns_mode             = "private"
   kubernetes_networking     = "flannel"
+  auditlog_logpath          = "/var/log/kube-apiserver-audit.log"
 }
 
 resource "random_id" "s3_suffix" {

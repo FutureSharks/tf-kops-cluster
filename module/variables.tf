@@ -85,6 +85,48 @@ variable "kubernetes_networking" {
   default = "calico"
 }
 
+# K8s Api server options
+
+# OIDC ClientID for apiserver auth
+variable "oidc_clientid" {
+  default = ""
+}
+
+# OIDC IssuerURL for apiserver auth
+variable "oidc_issuerurl" {
+  default = ""
+}
+
+# OIDC Username Claim. Default is "sub"
+variable "oidc_usernameclaim" {
+  default = ""
+}
+
+# OIDC Username prefix
+variable "oidc_usernameprefix" {
+  default = ""
+}
+
+# OIDC Groups Claim
+variable "oidc_groupsclaim" {
+  default = ""
+}
+
+# OIDC Groups prefix
+variable "oidc_groupsprefix" {
+  default = ""
+}
+
+# Auditlog file path
+variable "auditlog_logpath" {
+  default = ""
+}
+
+#Authentication webook token config
+variable "auth_webhook_config_file" {
+  default = ""
+}
+
 # Cloudwatch alarm CPU
 variable "master_k8s_cpu_threshold" {
   default = 80

@@ -63,7 +63,29 @@ In real use you should use a valid public Route53 zone and remove the private DN
 
 ## Supported settings
 
-Authentication: RBAC only
+### Kubernetes API Server settings:
+Currently this module only supports a handful of API server settings but they are trivial to add as you require them.
+
+| Parameter | Description | Example |
+| -------------- | --------------- | ------------ |
+| oidc_issuerurl | 	URL of the provider which allows the API server to discover public signing keys. Only URLs which use the https:// scheme are accepted. This is typically the provider’s discovery URL without a path, for example “https://accounts.google.com” or “https://login.salesforce.com”. This URL should point to the level below .well-known/openid-configuration | If the discovery URL is https://accounts.google.com/.well-known/openid-configuration, the value should be https://accounts.google.com
+| oidc_clientid | A client id that all tokens must be issued for. | kubernetes |
+| oidc_usernameclaim | JWT claim to use as the user name. By default sub, which is expected to be a unique identifier of the end user. Admins can choose other claims, such as email or name, depending on their provider. However, claims other than email will be prefixed with the issuer URL to prevent naming clashes with other plugins. | sub |
+| oidc_usernameprefix |Prefix prepended to username claims to prevent clashes with existing names (such as system: users). For example, the value oidc: will create usernames like oidc:jane.doe. If this flag isn’t provided and --oidc-user-claim is a value other than email the prefix defaults to ( Issuer URL )# where ( Issuer URL ) is the value of --oidc-issuer-url. The value - can be used to disable all prefixing.	 | oidc: |
+| oidc_groupsclaim | JWT claim to use as the user’s group. If the claim is present it must be an array of strings.	 | groups |
+| oidc_groupsprefix | Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). For example, the value oidc: will create group names like oidc:engineering and oidc:infra.	 | oidc: |
+| auditlog_logpath | specifies the log file path that log backend uses to write audit events. Not specifying this flag disables log backend. - means standard out | /var/log/audit |
+| auth_webhook_config_file | This is used for authentication webhooks. Required for [Heptio Authenticator for AWS](https://github.com/heptio/authenticator) for example. | /etc/kubernetes/heptio-authenticator-aws/kubeconfig.yaml |
+
+>For more information on OIDC Authentication in Kubernetes, read https://kubernetes.io/docs/admin/authentication/#openid-connect-tokens  
+>For more information on authenticating using AWS IAM role, read https://github.com/heptio/authenticator#how-do-i-use-it
+
+To add additional API Server settings, add new variables to the `k8s_apiserver_options` list in the  [`locals.tf`](https://github.com/FutureSharks/tf-kops-cluster/blob/master/module/locals.tf#L6) file and make sure they are formated correctly.  
+The correct final format is
+`Key: Value` where `Key` is a valid config flag from [Kops](https://github.com/kubernetes/kops/blob/master/docs/cluster_spec.md#kubeapiserver).
+
+
+Authorisation: RBAC
 
 Networking: calico or flannel
 

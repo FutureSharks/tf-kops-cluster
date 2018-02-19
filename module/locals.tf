@@ -2,6 +2,18 @@ locals {
   # Currently support kops version
   supported_kops_version = "1.8"
 
+  # KubeAPIServer optional vars
+  k8s_apiserver_options = [
+    "${var.oidc_clientid != "" ? "oidcClientID: ${var.oidc_clientid}" : ""}",
+    "${var.oidc_issuerurl != "" ? "oidcIssuerURL: ${var.oidc_issuerurl}" : ""}",
+    "${var.oidc_usernameclaim != "" ? "oidcUsernameClaim: ${var.oidc_usernameclaim}": ""}",
+    "${var.oidc_usernameprefix != "" ? "oidcUsernamePrefix: ${var.oidc_usernameprefix}": ""}",
+    "${var.oidc_groupsclaim != "" ? "oidcGroupsClaim: ${var.oidc_groupsclaim}": ""}",
+    "${var.oidc_groupsprefix != "" ? "oidcGroupsPrefix: ${var.oidc_groupsprefix}": ""}",
+    "${var.auditlog_logpath != "" ? "auditLogPath: ${var.auditlog_logpath}": ""}",
+    "${var.auth_webhook_config_file != "" ? "AuthenticationTokenWebhookConfigFile: ${var.auth_webhook_config_file}": ""}",
+  ]
+
   # Removes the last character of the FQDN if it is '.'
   cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
 

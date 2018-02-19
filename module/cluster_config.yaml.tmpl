@@ -1,0 +1,101 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: {{.cluster_fqdn}}
+spec:
+  {{- if .kubeAPIServer }}
+  kubeAPIServer:
+    {{- range $key, $value := .kubeAPIServer }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+  {{- end }}
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    RBAC: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://{{.kops_s3_bucket_id}}/{{.cluster_fqdn}}
+  etcdClusters:
+  - etcdMembers:
+  {{- range $index, $zone := splitList "," .zones }}
+    - instanceGroup: master-{{$zone}}
+      name: {{ substr ( int (sub (len $zone) 1 ) ) ( int ( len $zone) ) $zone }}
+  {{- end }}
+    name: main
+  - etcdMembers:
+   {{- range $index, $zone := splitList "," .zones }}
+    - instanceGroup: master-{{$zone}}
+      name: {{ substr ( int (sub (len $zone) 1 ) ) ( int ( len $zone) ) $zone }}
+  {{- end }}
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: {{.kubernetes_version}}
+  masterPublicName: api.{{.cluster_fqdn}}
+  networkCIDR: 172.41.0.0/16
+  networkID: {{.vpc_id}}
+  networking:
+    {{.kubernetes_networking}}: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  topology:
+    dns:
+      type: {{.kops_dns_mode | title}}
+    masters: {{.kops_dns_mode}}
+    nodes: {{.kops_dns_mode}}
+  subnets:
+  {{- range $index, $zone := splitList "," .zones }}
+  - cidr: 172.41.{{mul 32 (add $index 1)}}.0/19
+    name: {{$zone}}
+    type: Public
+    zone: {{$zone}}
+  {{- end}}
+
+---
+
+{{- range $index, $zone := splitList "," .zones }}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{$.cluster_fqdn}}
+  name:  master-{{$zone}}
+spec:
+  image: kope.io/{{$.ami_name}}
+  machineType: m3.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup:  master-{{$zone}}
+  role: Master
+  subnets:
+  - {{$zone}}
+
+---
+
+  {{- end }}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.cluster_fqdn}}
+  name: nodes
+spec:
+  image: kope.io/{{.ami_name}}
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  subnets:
+  {{- range $index, $zone := splitList "," .zones }}
+  - {{$zone}}
+  {{- end }}
