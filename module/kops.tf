@@ -44,7 +44,7 @@ resource "null_resource" "create_cluster" {
   depends_on = ["null_resource.check_kops_version", "null_resource.generate_template"]
 
   provisioner "local-exec" {
-    command = "kops create -f cluster_config.yaml --state=s3://${var.kops_s3_bucket_id} && kops create secret --state=s3://vend-test-kops-sydney --name cluster.ap-southeast-2.test.vendhq.com sshpublickey admin -i ~/.ssh/id_rsa.pub && kops update cluster ${var.cluster_fqdn} --state=s3://${var.kops_s3_bucket_id} --target=terraform --yes"
+    command = "kops create -f cluster_config.yaml --state=s3://${var.kops_s3_bucket_id} && kops create secret --state=s3://${var.kops_s3_bucket_id} --name ${var.cluster_fqdn} sshpublickey admin -i ~/.ssh/id_rsa.pub && kops update cluster ${var.cluster_fqdn} --state=s3://${var.kops_s3_bucket_id} --target=terraform --yes"
   }
 
   provisioner "local-exec" {
