@@ -65,3 +65,7 @@ output "nodes_role_arn" {
 output "nodes_role_name" {
   value = "${aws_iam_role.nodes.name}"
 }
+
+output "master_azs" {
+  value = "${local.master_azs}"
+}

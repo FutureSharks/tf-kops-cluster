@@ -21,6 +21,7 @@ module "cluster1" {
   internet_gateway_id       = "${aws_internet_gateway.public.id}"
   public_subnet_cidr_blocks = ["${local.cluster1_public_subnet_cidr_blocks}"]
   kops_dns_mode             = "private"
+  create_cluster_yaml_file  = "/Users/xxxxx/git/tf-kops-cluster/kops_output/kops/1.8.1/1.8.4/calico/s3/cluster.spec"
 }
 
 ################################################################################
@@ -28,7 +29,7 @@ module "cluster1" {
 
 module "cluster2" {
   source                    = "../module"
-  kubernetes_version        = "1.7.10"
+  kubernetes_version        = "1.8.6"
   sg_allow_ssh              = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s           = "${aws_security_group.allow_http.id}"
   cluster_name              = "cluster2"

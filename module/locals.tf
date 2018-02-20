@@ -21,6 +21,9 @@ locals {
 
   # Subnet IDs to be used by k8s ASGs
   k8s_subnet_ids = "${length(var.private_subnet_ids) == 0 ? join(",", aws_subnet.public.*.id) : join(",", var.private_subnet_ids)}"
+
+  # If var.create_cluster_yaml_file is set then use it
+  create_string = "${var.create_cluster_yaml_file != "" ? format("-f %v", var.create_cluster_yaml_file) : "cluster"}"
 }
 
 locals {

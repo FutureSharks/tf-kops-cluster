@@ -69,6 +69,11 @@ variable "kubernetes_version" {
   default = "1.8.4"
 }
 
+# Optional path to YAML file to use when creating the cluster. Can be used to add kubeAPIServer arguments
+variable "create_cluster_yaml_file" {
+  default = ""
+}
+
 # List of private subnet IDs. Pass 1 per AZ or if left blank then public subnets will be used
 variable "private_subnet_ids" {
   type    = "list"
