@@ -64,6 +64,11 @@ variable "node_asg_max" {
   default = 3
 }
 
+# Spot instance price, default is null
+variable "max_price_spot" {
+  default = ""
+}
+
 # Kubernetes version tag to use
 variable "kubernetes_version" {
   default = "1.8.4"
