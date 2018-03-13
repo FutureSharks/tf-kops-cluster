@@ -137,7 +137,7 @@ resource "aws_launch_configuration" "node_spot" {
 
   name_prefix          = "${var.cluster_name}-node-spot"
   image_id             = "${data.aws_ami.k8s_ami.id}"
-  instance_type        = "${var.node_instance_type}"
+  instance_type        = "${var.spot_node_instance_type}"
   key_name             = "${var.instance_key_name}"
   spot_price           = "${var.max_price_spot}"
   iam_instance_profile = "${aws_iam_instance_profile.nodes.name}"
