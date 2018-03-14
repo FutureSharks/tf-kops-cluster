@@ -46,6 +46,11 @@ variable "master_instance_type" {
 
 # Instance type for nodes
 variable "node_instance_type" {
+  default = "c4.xlarge"
+}
+
+# Spot node instance type
+variable "spot_node_instance_type" {
   default = "c4.large"
 }
 
