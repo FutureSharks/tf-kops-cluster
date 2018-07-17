@@ -37,6 +37,10 @@ resource "null_resource" "create_cluster" {
       ${local.cluster_fqdn}
     EOT
   }
+
+  lifecycle {
+    create_before_destroy = false
+  }
 }
 
 resource "null_resource" "delete_tf_files" {
