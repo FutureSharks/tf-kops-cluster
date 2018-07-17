@@ -14,9 +14,10 @@ resource "null_resource" "create_cluster" {
       --dns ${var.kops_dns_mode} \
       --authorization RBAC \
       --networking ${var.kubernetes_networking} \
-      --zones=${join(",", data.aws_availability_zones.available.names)} \
+      --zones=${join(",", local.az_names)} \
       --node-count=${var.node_asg_desired} \
-      --master-zones=${local.master_azs} \
+      --master-zones=${join(",", local.master_azs)} \
+      --master-count=${var.master_count} \
       --target=terraform \
       --api-loadbalancer-type=public \
       --vpc=${var.vpc_id} \

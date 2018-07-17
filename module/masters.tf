@@ -1,6 +1,6 @@
 resource "aws_autoscaling_group" "master" {
   depends_on           = ["null_resource.create_cluster"]
-  count                = "${local.master_resource_count}"
+  count                = "${var.master_count}"
   name                 = "${var.cluster_name}_master_${element(local.az_letters, count.index)}"
   vpc_zone_identifier  = ["${element(split(",", local.k8s_subnet_ids), count.index)}"]
   launch_configuration = "${element(aws_launch_configuration.master.*.id, count.index)}"
@@ -117,7 +117,7 @@ resource "aws_security_group" "master_elb" {
 }
 
 resource "aws_launch_configuration" "master" {
-  count                = "${local.master_resource_count}"
+  count                = "${var.master_count}"
   name_prefix          = "${var.cluster_name}-master-${element(local.az_names, count.index)}-"
   image_id             = "${data.aws_ami.k8s_ami.id}"
   instance_type        = "${var.master_instance_type}"
@@ -147,7 +147,7 @@ resource "aws_launch_configuration" "master" {
 }
 
 resource "aws_ebs_volume" "etcd-events" {
-  count             = "${local.master_resource_count}"
+  count             = "${var.master_count}"
   availability_zone = "${element(local.az_names, count.index)}"
   size              = 20
   type              = "gp2"
@@ -156,13 +156,13 @@ resource "aws_ebs_volume" "etcd-events" {
   tags = {
     KubernetesCluster    = "${local.cluster_fqdn}"
     Name                 = "${element(local.az_letters, count.index)}.etcd-events.${local.cluster_fqdn}"
-    "k8s.io/etcd/events" = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
+    "k8s.io/etcd/events" = "${element(local.az_letters, count.index)}/${local.etcd_azs_csv}"
     "k8s.io/role/master" = "1"
   }
 }
 
 resource "aws_ebs_volume" "etcd-main" {
-  count             = "${local.master_resource_count}"
+  count             = "${var.master_count}"
   availability_zone = "${element(local.az_names, count.index)}"
   size              = 20
   type              = "gp2"
@@ -171,13 +171,13 @@ resource "aws_ebs_volume" "etcd-main" {
   tags = {
     KubernetesCluster    = "${local.cluster_fqdn}"
     Name                 = "${element(local.az_letters, count.index)}.etcd-main.${local.cluster_fqdn}"
-    "k8s.io/etcd/main"   = "${element(local.az_letters, count.index)}/${local.etcd_azs}"
+    "k8s.io/etcd/main"   = "${element(local.az_letters, count.index)}/${local.etcd_azs_csv}"
     "k8s.io/role/master" = "1"
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "master_cpu" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_masters_k8s_cpu"
   alarm_description   = "K8s masters cluster CPU utilization"
   comparison_operator = "GreaterThanThreshold"
@@ -194,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "master_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_write_IOPS"
   alarm_description   = "Etcd Events EBS WriteOps"
   comparison_operator = "GreaterThanThreshold"
@@ -211,7 +211,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-events" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_queue_length"
   alarm_description   = "Etcd Events EBS Volume Queue Length"
   comparison_operator = "GreaterThanThreshold"
@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-events" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-events" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_events_ebs_read_IOPS"
   alarm_description   = "Etcd Events EBS ReadOps"
   comparison_operator = "GreaterThanThreshold"
@@ -245,7 +245,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-events" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_write_IOPS"
   alarm_description   = "Etcd Main EBS WriteOps"
   comparison_operator = "GreaterThanThreshold"
@@ -262,7 +262,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-wiops-etcd-main" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-mains" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_queue_length"
   alarm_description   = "Etcd Main EBS Volume Queue Length"
   comparison_operator = "GreaterThanThreshold"
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_metric_alarm" "ebs-vqlength-etcd-mains" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ebs-riops-etcd-main" {
-  count               = "${local.master_resource_count}"
+  count               = "${var.master_count}"
   alarm_name          = "${var.cluster_name}_${element(local.az_names, count.index)}_etcd_main_ebs_read_IOPS"
   alarm_description   = "Etcd Main EBS ReadOps"
   comparison_operator = "GreaterThanThreshold"

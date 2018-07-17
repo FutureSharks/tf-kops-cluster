@@ -33,10 +33,9 @@ variable "public_subnet_cidr_blocks" {
   type = "list"
 }
 
-# Force single master. Can be used when a master per AZ is not required or if running
-# in a region with only 2 AZs.
-variable "force_single_master" {
-  default = false
+# Set the desired amount of master nodes. NB! It should be odd for a quorum : 1, 3, 5, etc.
+variable "master_count" {
+  default = 3
 }
 
 # Instance type for the master
