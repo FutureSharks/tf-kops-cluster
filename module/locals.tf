@@ -1,6 +1,6 @@
 locals {
   # Currently support kops version
-  supported_kops_version = "1.8.1"
+  supported_kops_version = "1.9.1"
 
   # Removes the last character of the FQDN if it is '.'
   cluster_fqdn = "${replace(var.cluster_fqdn, "/\\.$/", "")}"
@@ -30,28 +30,30 @@ locals {
       kubectl_hash   = "36340bb4bb158357fe36ffd545d8295774f55ed9"
       cni_hash       = "1d9788b0f5420e1a219aad2cb8681823fc515e7c"
       cni_file_name  = "cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz"
-      utils_hash     = "42b15a0a0a56531750bde3c7b08d0cf27c170c48"
-      protokube_hash = "0b1f26208f8f6cc02468368706d0236670fec8a2"
-      ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
+      ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-01-14"
       docker_version = "1.13.1"
     }
+
     "1.8.6" = {
       kubelet_hash   = "96c23396f0bb67fae0da843cc5765d0e8411e552"
       kubectl_hash   = "59f138a5144224cb0c8ed440d3a0a0e91ef01271"
       cni_hash       = "1d9788b0f5420e1a219aad2cb8681823fc515e7c"
       cni_file_name  = "cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz"
-      utils_hash     = "42b15a0a0a56531750bde3c7b08d0cf27c170c48"
-      protokube_hash = "0b1f26208f8f6cc02468368706d0236670fec8a2"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
       ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-01-14"
       docker_version = "1.13.1"
     }
+
     "1.8.4" = {
       kubelet_hash   = "125993c220d1a9b5b60ad20a867a0e7cda63e64c"
       kubectl_hash   = "8e2314db816b9b4465c5f713c1152cb0603db15e"
       cni_hash       = "1d9788b0f5420e1a219aad2cb8681823fc515e7c"
       cni_file_name  = "cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz"
-      utils_hash     = "42b15a0a0a56531750bde3c7b08d0cf27c170c48"
-      protokube_hash = "0b1f26208f8f6cc02468368706d0236670fec8a2"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
       ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-01-14"
       docker_version = "1.13.1"
     }
@@ -61,8 +63,8 @@ locals {
       kubectl_hash   = "006fd43085e6ba2dc6b35b89af4d68cee3f689c9"
       cni_hash       = "1d9788b0f5420e1a219aad2cb8681823fc515e7c"
       cni_file_name  = "cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz"
-      utils_hash     = "42b15a0a0a56531750bde3c7b08d0cf27c170c48"
-      protokube_hash = "0b1f26208f8f6cc02468368706d0236670fec8a2"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
       ami_name       = "k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-01-14"
       docker_version = "1.13.1"
     }
@@ -72,8 +74,8 @@ locals {
       kubectl_hash   = "4c174128ad3657bb09c5b3bd4a05565956b44744"
       cni_hash       = "1d9788b0f5420e1a219aad2cb8681823fc515e7c"
       cni_file_name  = "cni-0799f5732f2a11b329d9e3d51b9c8f2e3759f2ff.tar.gz"
-      utils_hash     = "42b15a0a0a56531750bde3c7b08d0cf27c170c48"
-      protokube_hash = "0b1f26208f8f6cc02468368706d0236670fec8a2"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
       ami_name       = "k8s-1.7-debian-jessie-amd64-hvm-ebs-2017-12-02"
       docker_version = "1.12.6"
     }
