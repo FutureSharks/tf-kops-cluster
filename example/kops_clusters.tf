@@ -3,7 +3,7 @@
 
 module "cluster1" {
   source                    = "../module"
-  kubernetes_version        = "1.8.6"
+  kubernetes_version        = "1.9.9"
   sg_allow_ssh              = "${aws_security_group.allow_ssh.id}"
   sg_allow_http_s           = "${aws_security_group.allow_http.id}"
   cluster_name              = "cluster1"

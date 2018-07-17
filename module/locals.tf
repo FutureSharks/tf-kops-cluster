@@ -25,6 +25,17 @@ locals {
 
 locals {
   k8s_versions = {
+    "1.9.9" = {
+      kubelet_hash   = "31486e1a1af01101eca1075af7281e67e47aed87"
+      kubectl_hash   = "c8163a6360119c56d163fbd8cef8727e9841e712"
+      cni_hash       = "d595d3ded6499a64e8dac02466e2f5f2ce257c9f"
+      cni_file_name  = "cni-plugins-amd64-v0.6.0.tgz"
+      utils_hash     = "aad29883ed2ad2288f708487e1217c079604e9ef"
+      protokube_hash = "439b34ab45d5dbe309c7235890ec753e1f6bd9a1"
+      ami_name       = "k8s-1.9-debian-jessie-amd64-hvm-ebs-2018-03-11"
+      docker_version = "17.03.2"
+    }
+
     "1.8.7" = {
       kubelet_hash   = "0f3a59e4c0aae8c2b2a0924d8ace010ebf39f48e"
       kubectl_hash   = "36340bb4bb158357fe36ffd545d8295774f55ed9"

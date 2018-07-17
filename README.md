@@ -49,3 +49,4 @@ Supported Kubernetes versions:
   - 1.8.4
   - 1.8.6
   - 1.8.7
+  - 1.9.9
