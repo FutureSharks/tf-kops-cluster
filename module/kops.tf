@@ -16,8 +16,10 @@ resource "null_resource" "create_cluster" {
       --networking ${var.kubernetes_networking} \
       --zones=${join(",", local.az_names)} \
       --node-count=${var.node_asg_desired} \
+      --node-size=${var.node_instance_type} \
       --master-zones=${join(",", local.master_azs)} \
       --master-count=${var.master_count} \
+      --master-size=${var.master_instance_type} \
       --target=terraform \
       --api-loadbalancer-type=public \
       --vpc=${var.vpc_id} \
