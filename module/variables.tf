@@ -99,3 +99,9 @@ variable "kubernetes_networking" {
 variable "master_k8s_cpu_threshold" {
   default = 80
 }
+
+# Local path to the SSH public key. It's not used effectively, but kops requires it
+variable "ssh_public_key_path" {
+  default = "~/.ssh/id_rsa.pub"
+  type = "string"
+}
